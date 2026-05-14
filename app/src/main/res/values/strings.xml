@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Primitive Device Stoic</string>
+    <string name="app_list">App List</string>
+    <string name="days_alive">Today is your %1$d. day. think about your actions</string>
+    <string name="battery">Battery: %1$d%%</string>
+    <string name="unlocks">Unlocks: %1$d</string>
+    <string name="virtue_wisdom">Wisdom</string>
+    <string name="virtue_justice">Justice</string>
+    <string name="virtue_courage">Courage</string>
+    <string name="virtue_temperance">Temperance</string>
+    <string name="offline_mode_on">Offline Mode: ON</string>
+    <string name="offline_mode_off">Offline Mode: OFF</string>
+    <string name="usage_permission_needed">Enable usage access (click here)</string>
+    <string name="add_app">Add app</string>
+    <string name="add_label">Add</string>
+    <string name="what_looking_for">what are you looking for?</string>
+    <string name="intention">Intention of the day</string>
+    <string name="edit">Edit</string>
+    <string name="time_since_last_use">Time since last use: %1$s</string>
+    <string name="hours_remaining">Remaining today: %1$d hours</string>
+    <string name="time_until_sleep">Time until sleep: %1$s</string>
+    <string name="sleep_time_label">Sleep time</string>
+    <string name="hours_remaining_combined">Remaining today: %1$d hours and %2$s until sleep</string>
+    <string name="editor_settings">Editor Settings</string>
+    <string name="evening_reminder">Evening reminder</string>
+    <string name="reminder_time">Reminder time</string>
+    <string name="birth_date">Date of birth</string>
+    <string name="set_label">Set</string>
+    <string name="close">Close</string>
+    <string name="selected">Selected</string>
+    <string name="welcome_title">Welcome to Primitive Stoic Launcher</string>
+    <string name="welcome_description">To function properly, the app needs to be set as the default launcher.</string>
+    <string name="set_as_default">Set as default</string>
+    <string name="already_set_as_default">✅ Set as default</string>
+    <string name="continue_label">Continue</string>
+</resources>

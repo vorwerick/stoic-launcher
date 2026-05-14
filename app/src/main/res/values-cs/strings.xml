@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Primitive Device Stoic</string>
+    <string name="app_list">Seznam aplikací</string>
+    <string name="days_alive">Dnes je tvůj %1$d. den. přemýšlej nad svými činny</string>
+    <string name="battery">Baterie: %1$d%%</string>
+    <string name="unlocks">Odemknutí: %1$d</string>
+    <string name="virtue_wisdom">Moudrost</string>
+    <string name="virtue_justice">Spravedlnost</string>
+    <string name="virtue_courage">Statečnost</string>
+    <string name="virtue_temperance">Umírněnost</string>
+    <string name="offline_mode_on">Offline Mode: ZAPNUTO</string>
+    <string name="offline_mode_off">Offline Mode: VYPNUTO</string>
+    <string name="usage_permission_needed">Povolte přístup k využití (klikněte zde)</string>
+    <string name="add_app">Přidat aplikaci</string>
+    <string name="add_label">Přidat</string>
+    <string name="what_looking_for">co přesně hledáš?</string>
+    <string name="intention">Záměr dne</string>
+    <string name="edit">Edit</string>
+    <string name="time_since_last_use">Čas od posledního použití: %1$s</string>
+    <string name="hours_remaining">Do konce dne zbývá %1$d hodin</string>
+    <string name="time_until_sleep">Do spánku zbývá %1$s</string>
+    <string name="sleep_time_label">Čas spánku</string>
+    <string name="hours_remaining_combined">Do konce dne zbývá %1$d hodin a %2$s do spánku</string>
+    <string name="editor_settings">Nastavení editoru</string>
+    <string name="evening_reminder">Večerní upomínka</string>
+    <string name="reminder_time">Čas upomínky</string>
+    <string name="birth_date">Datum narození</string>
+    <string name="set_label">Nastavit</string>
+    <string name="close">Zavřít</string>
+    <string name="selected">Vybráno</string>
+    <string name="welcome_title">Vítejte v Primitive Stoic Launcher</string>
+    <string name="welcome_description">Pro správné fungování je potřeba nastavit aplikaci jako výchozí launcher.</string>
+    <string name="set_as_default">Nastavit jako výchozí</string>
+    <string name="already_set_as_default">✅ Nastaveno jako výchozí</string>
+    <string name="continue_label">Pokračovat</string>
+</resources>
