@@ -1,0 +1,34 @@
+Primitive Device Stoic – stoický launcher pro soustředěný život
+
+Unavila tě nekonečná kolotoč notifikací, barevných ikon a pokušení ke scrollování? Primitive Device Stoic je minimalistický launcher inspirovaný stoickou filozofií, který nahrazuje domovskou obrazovku tvého telefonu a pomáhá ti žít záměrněji.
+
+PROČ PRIMITIVE DEVICE STOIC?
+
+Stoici věřili, že klid a soustředění přicházejí skrze disciplínu a uvědomění – ne skrze rozptylování. Tato aplikace ti každý den připomíná, kdo chceš být, a zároveň snižuje digitální chaos na minimum.
+
+CO APLIKACE UMÍ:
+
+• Denní stoické citáty – každý den nová myšlenka od Marka Aurelia, Senecy nebo Epiktéta, přeložená do češtiny
+• Denní záměr – nastav si každý den jeden záměr a drž se ho
+• Počítač odemčení – vidíš, kolikrát jsi telefon odemkl/a. Méně je více.
+• Sledování doby u obrazovky – přehled o čase stráveném na telefonu
+• Rychlý přístup k aplikacím – vyber si až 10 aplikací, které opravdu potřebuješ
+• Šedé ikony – ikony aplikací jsou zobrazeny v odstínech šedi, aby lákaly méně
+• Odpočítávání do spánku – nastav si čas spánku a sleduj, kolik hodin ti zbývá
+• Večerní připomínky – jemná notifikace k reflexi před spaním
+• Stav baterie – vždy přehledně na hlavní obrazovce
+• Čítač dnů – sleduj, jak dlouho praktikuješ digitální minimalismus
+
+PRO KOHO JE TATO APLIKACE?
+
+Pro každého, kdo chce:
+– Trávit méně času na telefonu
+– Mít jasnější mysl a více soustředění
+– Praktikovat digitální minimalismus
+– Každý den začínat se záměrem
+
+TECHNICKÉ INFORMACE:
+
+Aplikace nevyžaduje internetové připojení a neposílá žádná data na servery. Veškerá data jsou uložena pouze v telefonu. Ke správné funkci vyžaduje povolení přístupu k statistikám využití aplikací (nastavíš ručně v Nastavení → Soukromí).
+
+Primitive Device Stoic – záměr nad rozptylováním.

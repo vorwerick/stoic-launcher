@@ -1,0 +1,34 @@
+Primitive Device Stoic – A Stoic Launcher for a Focused Life
+
+Tired of the endless cycle of notifications, colorful icons, and the temptation to scroll? Primitive Device Stoic is a minimalist Android launcher inspired by Stoic philosophy that replaces your home screen and helps you live with more intention.
+
+WHY PRIMITIVE DEVICE STOIC?
+
+The Stoics believed that tranquility and focus come through discipline and awareness – not through distraction. This app reminds you every day who you want to be, while reducing digital chaos to a minimum.
+
+WHAT THE APP DOES:
+
+• Daily Stoic quotes – a new thought from Marcus Aurelius, Seneca, or Epictetus every day
+• Daily intention – set one intention for the day and stick to it
+• Unlock counter – see how many times you've picked up your phone. Less is more.
+• Screen time tracking – an overview of time spent on your phone
+• Quick app access – choose up to 10 apps you truly need
+• Grayscale icons – app icons are shown in grayscale to make them less tempting
+• Sleep countdown – set your sleep time and track how many hours remain
+• Evening reminders – a gentle notification for reflection before bed
+• Battery status – always visible on the home screen
+• Day counter – track how long you've been practicing digital minimalism
+
+WHO IS THIS APP FOR?
+
+For anyone who wants to:
+– Spend less time on their phone
+– Have a clearer mind and more focus
+– Practice digital minimalism
+– Start each day with intention
+
+TECHNICAL INFORMATION:
+
+The app does not require an internet connection and sends no data to external servers. All data is stored locally on your device. For full functionality, it requires access to usage statistics (granted manually in Settings → Privacy).
+
+Primitive Device Stoic – intention over distraction.

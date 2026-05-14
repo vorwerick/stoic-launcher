@@ -4,7 +4,6 @@ import android.app.role.RoleManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.Process
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,9 +14,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -26,6 +22,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorMatrix
@@ -48,6 +45,9 @@ import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
+private data class AnswerData(val text: String, val correct: Boolean)
+private data class QuestionData(val question: String, val answers: List<AnswerData>)
+
 @OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
@@ -56,58 +56,67 @@ fun HomeScreen(
     val context = LocalContext.current
     val apps by viewModel.apps.collectAsState()
     val selectedApps by viewModel.selectedApps.collectAsState()
-    val batteryPercentage by viewModel.batteryPercentage.collectAsState()
     val isEditorMode by viewModel.isEditorMode.collectAsState()
     val isReminderEnabled by viewModel.isReminderEnabled.collectAsState()
-    val isOfflineMode by viewModel.isOfflineMode.collectAsState()
     val reminderTime by viewModel.reminderTime.collectAsState()
-    val todayUnlockCount by viewModel.todayUnlockCount.collectAsState()
     val daysAlive by viewModel.daysAlive.collectAsState()
     val birthDate by viewModel.birthDate.collectAsState()
     val quote by viewModel.quote.collectAsState()
     val intention by viewModel.intention.collectAsState()
     val sleepTime by viewModel.sleepTime.collectAsState()
     val timeUntilSleep by viewModel.timeUntilSleep.collectAsState()
-    val hoursRemaining by viewModel.hoursRemaining.collectAsState()
-    val timeSinceLastUse by viewModel.timeSinceLastUse.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
-    
+    val isDefaultLauncher by viewModel.isDefaultLauncher.collectAsState()
+
     var showIntentionEdit by remember { mutableStateOf(false) }
     var intentionText by remember { mutableStateOf(intention) }
-    
-    LaunchedEffect(intention) {
-        intentionText = intention
+    var isLocked by remember { mutableStateOf(true) }
+
+    LaunchedEffect(intention) { intentionText = intention }
+
+    val stoicQuestions = remember {
+        listOf(
+            QuestionData(
+                "Co je v tvé moci?",
+                listOf(
+                    AnswerData("Moje myšlenky a činy", true),
+                    AnswerData("Reakce ostatních", false),
+                    AnswerData("Výsledky mého úsilí", false)
+                ).shuffled()
+            ),
+            QuestionData(
+                "Jak stoici přistupují k překážkám?",
+                listOf(
+                    AnswerData("Překážka se stává cestou", true),
+                    AnswerData("Vyhýbají se jim za každou cenu", false),
+                    AnswerData("Hledají vnější pomoc", false)
+                ).shuffled()
+            ),
+            QuestionData(
+                "Co je základem stoického myšlení?",
+                listOf(
+                    AnswerData("Rozlišit, co závisí na nás", true),
+                    AnswerData("Ovládat všechny situace", false),
+                    AnswerData("Potlačit všechny emoce", false)
+                ).shuffled()
+            )
+        )
     }
+    val currentQuestion = remember { stoicQuestions.random() }
 
     val selectedPackageNames by remember {
         derivedStateOf { selectedApps.map { it.packageName }.toSet() }
     }
-    
+
     var showAppList by remember { mutableStateOf(false) }
     var isSelectionMode by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
-    val isDefaultLauncher by viewModel.isDefaultLauncher.collectAsState()
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
-    ) {
-        viewModel.updateDefaultLauncherStatus()
-    }
+    ) { viewModel.updateDefaultLauncherStatus() }
 
-    val hasUsageStatsPermission = remember {
-        val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as android.app.AppOpsManager
-        val mode = appOps.noteOpNoThrow(
-            android.app.AppOpsManager.OPSTR_GET_USAGE_STATS,
-            Process.myUid(),
-            context.packageName
-        )
-        mode == android.app.AppOpsManager.MODE_ALLOWED
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.fullRefresh()
-    }
+    LaunchedEffect(Unit) { viewModel.fullRefresh() }
 
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
@@ -141,61 +150,27 @@ fun HomeScreen(
                     .windowInsetsTopHeight(WindowInsets.statusBars)
                     .background(Color.Black)
             )
-        },
-        bottomBar = {
-            Button(
-                onClick = { showAppList = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = White
-                ),
-                border = androidx.compose.foundation.BorderStroke(1.dp, White)
-            ) {
-                Text(stringResource(R.string.app_list))
-            }
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // 1. Rotating prompt: stoické citáty
             Text(
                 text = "\"$quote\"",
                 style = MaterialTheme.typography.bodyLarge.copy(fontStyle = FontStyle.Italic),
                 color = White,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 24.dp, bottom = 16.dp)
+                modifier = Modifier.padding(top = 24.dp, bottom = 4.dp)
             )
 
-            // 2. Text: Do konce dnešního dne zbývá X hodin a minut do spánku, dnešní den je tvůj Y. v životě
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "Do konce dne zbývá $hoursRemaining hodin a $timeUntilSleep do spánku",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = White
-                )
-                daysAlive?.let {
-                    Text(
-                        text = stringResource(R.string.days_alive, it),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = White
-                    )
-                }
-            }
-
-            // 3. Možnost zadat si záměr dne, popis se záměrem a tlačítko edit
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -230,7 +205,7 @@ fun HomeScreen(
                         style = MaterialTheme.typography.bodyLarge,
                         color = White,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier.padding(vertical = 4.dp)
                     )
                     Text(
                         text = stringResource(R.string.edit),
@@ -241,52 +216,111 @@ fun HomeScreen(
                 }
             }
 
-            // 4. Čas uplynulý od posledního použití telefonu
-            Text(
-                text = stringResource(R.string.time_since_last_use, timeSinceLastUse),
-                style = MaterialTheme.typography.bodySmall,
-                color = White.copy(alpha = 0.7f)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Do spánku: $timeUntilSleep",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = White
+                )
+                daysAlive?.let {
+                    Text(
+                        text = stringResource(R.string.days_alive, it),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = White
+                    )
+                }
+            }
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .weight(1f)
                     .border(1.dp, White)
-                    .padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(5),
-                    modifier = Modifier.fillMaxWidth().heightIn(max = 150.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .then(if (isLocked) Modifier.blur(18.dp) else Modifier)
+                        .padding(8.dp)
                 ) {
-                    items(10) { index -> // 2 řady po 5 pro "Rychlé aplikace"
-                        val app = selectedApps.getOrNull(index)
-                        AppIconItem(
-                            app = app,
-                            onClick = {
-                                if (app != null) {
-                                    try {
-                                        val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
-                                        if (intent != null) {
-                                            context.startActivity(intent)
-                                        }
-                                    } catch (e: Exception) {}
-                                } else {
-                                    isSelectionMode = true
-                                    showAppList = true
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        verticalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        repeat(10) { index ->
+                            val app = selectedApps.getOrNull(index)
+                            VerticalAppItem(
+                                app = app,
+                                onClick = {
+                                    if (app != null) {
+                                        try {
+                                            val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
+                                            if (intent != null) context.startActivity(intent)
+                                        } catch (e: Exception) {}
+                                    } else {
+                                        isSelectionMode = true
+                                        showAppList = true
+                                    }
+                                },
+                                onLongClick = {
+                                    if (app != null) {
+                                        viewModel.toggleAppSelection(app)
+                                    } else {
+                                        isSelectionMode = true
+                                        showAppList = true
+                                    }
                                 }
-                            },
-                            onLongClick = {
-                                if (app != null) {
-                                    viewModel.toggleAppSelection(app)
-                                } else {
-                                    isSelectionMode = true
-                                    showAppList = true
-                                }
-                            }
+                            )
+                        }
+                    }
+
+                    Button(
+                        onClick = { showAppList = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = White
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, White)
+                    ) {
+                        Text(stringResource(R.string.app_list))
+                    }
+                }
+
+                if (isLocked) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable { }
+                            .padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = currentQuestion.question,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = White,
+                            textAlign = TextAlign.Center
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        currentQuestion.answers.forEach { answer ->
+                            Button(
+                                onClick = { if (answer.correct) isLocked = false },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Black.copy(alpha = 0.55f),
+                                    contentColor = White
+                                ),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, White)
+                            ) {
+                                Text(answer.text)
+                            }
+                        }
                     }
                 }
             }
@@ -303,9 +337,7 @@ fun HomeScreen(
             text = {
                 Column {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -317,9 +349,7 @@ fun HomeScreen(
                     }
                     if (isReminderEnabled) {
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
@@ -336,11 +366,9 @@ fun HomeScreen(
                             )
                         }
                     }
-                    
+
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -349,7 +377,6 @@ fun HomeScreen(
                             text = sleepTime,
                             modifier = Modifier
                                 .clickable {
-                                    // Pro jednoduchost budeme cyklit mezi 21:00, 22:00, 23:00, 00:00
                                     val nextTime = when (sleepTime) {
                                         "21:00" -> "22:00"
                                         "22:00" -> "23:00"
@@ -364,15 +391,15 @@ fun HomeScreen(
                     }
 
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(stringResource(R.string.birth_date))
                         Text(
-                            text = birthDate?.let { SimpleDateFormat("d. M. yyyy", Locale.getDefault()).format(Date(it)) } ?: stringResource(R.string.set_label),
+                            text = birthDate?.let {
+                                SimpleDateFormat("d. M. yyyy", Locale.getDefault()).format(Date(it))
+                            } ?: stringResource(R.string.set_label),
                             modifier = Modifier
                                 .clickable { showDatePicker = true }
                                 .padding(8.dp),
@@ -397,10 +424,7 @@ fun HomeScreen(
                                 launcher.launch(intent)
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = Color.Black
-                            )
+                            colors = ButtonDefaults.buttonColors(containerColor = White, contentColor = Color.Black)
                         ) {
                             Text(stringResource(R.string.set_as_default))
                         }
@@ -421,13 +445,9 @@ fun HomeScreen(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let {
-                        viewModel.setBirthDate(it)
-                    }
+                    datePickerState.selectedDateMillis?.let { viewModel.setBirthDate(it) }
                     showDatePicker = false
-                }) {
-                    Text("OK")
-                }
+                }) { Text("OK") }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
@@ -441,16 +461,16 @@ fun HomeScreen(
 
     if (showAppList) {
         ModalBottomSheet(
-            onDismissRequest = { 
+            onDismissRequest = {
                 showAppList = false
                 isSelectionMode = false
                 viewModel.setSearchQuery("")
             }
         ) {
             val sortedApps by remember(apps, searchQuery) {
-                derivedStateOf { 
+                derivedStateOf {
                     apps.filter { it.label.contains(searchQuery, ignoreCase = true) }
-                        .sortedBy { it.label.lowercase() } 
+                        .sortedBy { it.label.lowercase() }
                 }
             }
             Column(
@@ -462,10 +482,10 @@ fun HomeScreen(
                 TextField(
                     value = searchQuery,
                     onValueChange = { viewModel.setSearchQuery(it) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    placeholder = { Text(stringResource(R.string.what_looking_for), color = White.copy(alpha = 0.5f)) },
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    placeholder = {
+                        Text(stringResource(R.string.what_looking_for), color = White.copy(alpha = 0.5f))
+                    },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
@@ -477,14 +497,9 @@ fun HomeScreen(
                     ),
                     singleLine = true
                 )
-                
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth().weight(1f)
-                ) {
-                    items(
-                        items = sortedApps,
-                        key = { it.packageName }
-                    ) { app ->
+
+                LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                    items(items = sortedApps, key = { it.packageName }) { app ->
                         val isSelected = selectedPackageNames.contains(app.packageName)
                         Row(
                             modifier = Modifier
@@ -500,9 +515,7 @@ fun HomeScreen(
                                                 showAppList = false
                                                 viewModel.setSearchQuery("")
                                             }
-                                        } catch (e: Exception) {
-                                            // Silent fail
-                                        }
+                                        } catch (e: Exception) {}
                                     }
                                 }
                                 .padding(vertical = 12.dp, horizontal = 8.dp),
@@ -527,22 +540,22 @@ fun HomeScreen(
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun AppIconItem(
+fun VerticalAppItem(
     app: AppInfo?,
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Row(
         modifier = Modifier
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            )
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 2.dp)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)
+                .size(40.dp)
                 .clip(CircleShape)
                 .background(if (app == null) Color.DarkGray else Color.Transparent),
             contentAlignment = Alignment.Center
@@ -563,5 +576,12 @@ fun AppIconItem(
                 )
             }
         }
+        Text(
+            text = app?.label ?: "",
+            style = MaterialTheme.typography.bodyMedium,
+            color = White,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }

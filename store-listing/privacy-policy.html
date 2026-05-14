@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zásady ochrany osobních údajů – Primitive Device Stoic</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; line-height: 1.7; color: #222; }
+    h1 { font-size: 1.6em; }
+    h2 { font-size: 1.2em; margin-top: 2em; }
+    p, li { font-size: 0.97em; }
+  </style>
+</head>
+<body>
+
+<h1>Zásady ochrany osobních údajů</h1>
+<p><strong>Aplikace:</strong> Primitive Device Stoic<br />
+<strong>Vývojář:</strong> Aleš (ales)<br />
+<strong>Datum účinnosti:</strong> 14. května 2026</p>
+
+<h2>1. Úvod</h2>
+<p>Aplikace Primitive Device Stoic (dále jen „Aplikace") je minimalistický launcher pro Android inspirovaný stoickou filozofií. Vývojář se zavazuje chránit soukromí uživatelů. Tyto zásady popisují, jaká data jsou (a nejsou) zpracovávána.</p>
+
+<h2>2. Jaká data aplikace zpracovává</h2>
+<p>Aplikace <strong>neodesílá žádná data na externí servery</strong>. Veškerá data jsou uložena výhradně v zařízení uživatele pomocí systémového úložiště SharedPreferences.</p>
+
+<p>Aplikace lokálně ukládá:</p>
+<ul>
+  <li>Časy odemčení obrazovky (posledních 50 záznamů)</li>
+  <li>Denní záměr (text zadaný uživatelem)</li>
+  <li>Vybrané aplikace pro rychlý přístup (max 10)</li>
+  <li>Nastavený čas spánku a čas večerní připomínky</li>
+  <li>Datum narození (pokud uživatel vyplní)</li>
+  <li>Stav přepínačů (offline režim, připomínky)</li>
+</ul>
+
+<p>Tato data opustí zařízení pouze prostřednictvím standardního zálohovacího mechanismu systému Android (pokud jej uživatel povolil), a nikdy nejsou přístupna vývojáři.</p>
+
+<h2>3. Přístup ke statistikám využití aplikací</h2>
+<p>Aplikace může požádat o systémové oprávnění <code>PACKAGE_USAGE_STATS</code>. Toto oprávnění slouží výhradně k zobrazení celkové doby strávené na telefonu přímo v Aplikaci. Data jsou zpracovávána lokálně a nikam se neodesílají.</p>
+
+<h2>4. Oprávnění aplikace</h2>
+
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse; width:100%;">
+  <thead>
+    <tr style="background:#f0f0f0;">
+      <th>Oprávnění</th>
+      <th>Účel</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>QUERY_ALL_PACKAGES</td>
+      <td>Zobrazení seznamu nainstalovaných aplikací pro výběr rychlého přístupu</td>
+    </tr>
+    <tr>
+      <td>PACKAGE_USAGE_STATS</td>
+      <td>Sledování doby strávené na telefonu (uděluje uživatel ručně)</td>
+    </tr>
+    <tr>
+      <td>RECEIVE_BOOT_COMPLETED</td>
+      <td>Obnovení plánovaných připomínek po restartu zařízení</td>
+    </tr>
+    <tr>
+      <td>POST_NOTIFICATIONS</td>
+      <td>Zasílání večerních připomínek k reflexi</td>
+    </tr>
+    <tr>
+      <td>SCHEDULE_EXACT_ALARM</td>
+      <td>Přesné naplánování večerní připomínky</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. Reklamy a analytika</h2>
+<p>Aplikace <strong>neobsahuje reklamy</strong> a <strong>neshromažďuje žádná analytická data</strong>. Nejsou integrovány žádné SDK třetích stran (Google Analytics, Firebase, Facebook apod.).</p>
+
+<h2>6. Data dětí</h2>
+<p>Aplikace není určena dětem mladším 13 let a vědomě neshromažďuje žádné údaje od osob mladších 13 let.</p>
+
+<h2>7. Zabezpečení</h2>
+<p>Veškerá data jsou uložena v interním úložišti zařízení a jsou chráněna standardními bezpečnostními mechanismy systému Android. Vývojář nemá k těmto datům přístup.</p>
+
+<h2>8. Změny zásad</h2>
+<p>Případné změny těchto zásad budou zveřejněny na stránce aplikace v obchodě Google Play. Datum účinnosti bude aktualizováno.</p>
+
+<h2>9. Kontakt</h2>
+<p>Máte-li dotazy k ochraně osobních údajů, kontaktujte nás prostřednictvím stránky aplikace v Google Play nebo GitHub Issues.</p>
+
+<hr />
+<p><em>Tyto zásady jsou platné od 14. května 2026.</em></p>
+
+</body>
+</html>

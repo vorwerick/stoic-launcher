@@ -13,3 +13,10 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Podpisové soubory – NIKDY neverzovat!
+keystore.properties
+secret.properties
+*.jks
+*.keystore
+/release-output/
