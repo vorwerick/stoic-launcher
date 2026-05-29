@@ -38,7 +38,7 @@
                 android:launchMode="singleTask"
                 android:clearTaskOnLaunch="true"
                 android:stateNotNeeded="true"
-                android:theme="@style/Theme.PrimitiveDeviceStoic">
+                android:theme="@style/Theme.PrimitiveDeviceStoic.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

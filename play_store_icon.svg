@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+
+  <!-- Černé pozadí -->
+  <rect width="512" height="512" fill="#000000"/>
+
+  <!-- Obrys telefonu -->
+  <path d="M151,113 Q151,91 173,91 L339,91 Q361,91 361,113 L361,399 Q361,421 339,421 L173,421 Q151,421 151,399 Z"
+        fill="none" stroke="white" stroke-width="12" stroke-linejoin="round"/>
+
+  <!-- Reproduktor / notch -->
+  <line x1="206" y1="110" x2="306" y2="110"
+        stroke="white" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Domovský proužek -->
+  <line x1="221" y1="404" x2="291" y2="404"
+        stroke="white" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Ankh – smyčka (kruh) -->
+  <circle cx="256" cy="228" r="44"
+          fill="none" stroke="white" stroke-width="12"/>
+
+  <!-- Ankh – svislá tyč -->
+  <line x1="256" y1="272" x2="256" y2="366"
+        stroke="white" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Ankh – příčná tyč -->
+  <line x1="210" y1="308" x2="302" y2="308"
+        stroke="white" stroke-width="12" stroke-linecap="round"/>
+
+</svg>

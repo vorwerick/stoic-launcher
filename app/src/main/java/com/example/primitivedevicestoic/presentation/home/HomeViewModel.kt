@@ -82,6 +82,9 @@ class HomeViewModel(
     private val _isDefaultLauncher = MutableStateFlow(isDefaultLauncher(context))
     val isDefaultLauncher: StateFlow<Boolean> = _isDefaultLauncher.asStateFlow()
 
+    private val _lockTrigger = MutableStateFlow(0)
+    val lockTrigger: StateFlow<Int> = _lockTrigger.asStateFlow()
+
     private var updateJob: kotlinx.coroutines.Job? = null
 
     private val batteryReceiver = object : BroadcastReceiver() {
@@ -349,6 +352,7 @@ class HomeViewModel(
     }
 
     fun fullRefresh() {
+        _lockTrigger.value++
         refreshStats()
         _apps.value = repository.getInstalledApps()
         updateSelectedAppsList(_selectedApps.value.map { it.packageName })
