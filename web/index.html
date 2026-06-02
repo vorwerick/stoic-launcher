@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primitive Device Stoic – Stoický launcher pro soustředěný život</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --subtle-color: #666666;
+            --border-color: #eeeeee;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            margin: 0 auto;
+            padding: 40px 0;
+        }
+
+        header {
+            text-align: center;
+            padding: 80px 0 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            color: var(--subtle-color);
+            font-size: 1.2rem;
+            font-weight: 300;
+            margin-bottom: 40px;
+        }
+
+        .hero {
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 60px;
+            margin-bottom: 60px;
+        }
+
+        .hero-text {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            font-weight: 300;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border: 1px solid var(--text-color);
+            color: var(--text-color);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .section-title {
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 400;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: var(--subtle-color);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .feature-item {
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .feature-item h3 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0;
+        }
+
+        .feature-item p {
+            font-size: 0.9rem;
+            color: var(--subtle-color);
+            margin-bottom: 0;
+        }
+
+        .screenshots {
+            display: flex;
+            overflow-x: auto;
+            gap: 20px;
+            padding-bottom: 20px;
+            margin-bottom: 60px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--subtle-color) var(--bg-color);
+        }
+
+        .screenshot-placeholder {
+            min-width: 250px;
+            height: 500px;
+            background-color: #f9f9f9;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--subtle-color);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid var(--border-color);
+            width: 100%;
+            color: var(--subtle-color);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .hero-text { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Primitive Device Stoic</h1>
+            <p class="tagline">Záměr nad rozptylováním</p>
+            <a href="https://play.google.com/store/apps/details?id=com.example.primitivedevicestoic" class="btn">Získat aplikaci</a>
+        </header>
+
+        <section class="hero">
+            <p class="hero-text">
+                Unavila tě nekonečná kolotoč notifikací, barevných ikon a pokušení ke scrollování? 
+                Náš minimalistický launcher inspirovaný stoickou filozofií ti pomůže získat zpět tvůj čas a pozornost.
+            </p>
+            <a href="https://play.google.com/store/apps/details?id=com.example.primitivedevicestoic" class="btn">Stáhnout na Google Play</a>
+        </section>
+
+        <h2 class="section-title">Screenshoty</h2>
+        <section class="screenshots">
+            <div class="screenshot-placeholder">Screenshot 1<br>(Home Screen)</div>
+            <div class="screenshot-placeholder">Screenshot 2<br>(App List)</div>
+            <div class="screenshot-placeholder">Screenshot 3<br>(Settings)</div>
+            <div class="screenshot-placeholder">Screenshot 4<br>(Search)</div>
+        </section>
+
+        <h2 class="section-title">Co aplikace nabízí</h2>
+        <section class="features">
+            <div class="feature-item">
+                <h3>Stoické citáty</h3>
+                <p>Každý den nová myšlenka od Marka Aurelia, Senecy nebo Epiktéta přímo na tvé ploše.</p>
+            </div>
+            <div class="feature-item">
+                <h3>Vlastní záměr</h3>
+                <p>Nastav si každý den jeden hlavní cíl a měj ho stále na očích.</p>
+            </div>
+            <div class="feature-item">
+                <h3>Digitální minimalismus</h3>
+                <p>Počítadlo odemčení a šedé ikony snižují lákavost telefonu a tvůj screen time.</p>
+            </div>
+            <div class="feature-item">
+                <h3>Odpočet do spánku</h3>
+                <p>Sleduj, kolik času ti zbývá do konce dne, abys ho využil/a smysluplně.</p>
+            </div>
+        </section>
+
+        <section class="hero" style="border-bottom: none; margin-bottom: 0;">
+            <h2 class="section-title">Proč si ji stáhnout?</h2>
+            <p class="hero-text">
+                Stoici věřili, že klid a soustředění přicházejí skrze disciplínu a uvědomění. 
+                Tato aplikace ti každý den připomíná, kdo chceš být, a zároveň snižuje digitální chaos na minimum.
+            </p>
+            <a href="https://play.google.com/store/apps/details?id=com.example.primitivedevicestoic" class="btn">Začít žít záměrněji</a>
+        </section>
+    </div>
+
+    <footer>
+        &copy; 2026 Primitive Device Stoic. Žádná data nejsou odesílána na servery.
+    </footer>
+
+</body>
+</html>

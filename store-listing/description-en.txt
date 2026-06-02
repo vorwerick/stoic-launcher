@@ -9,7 +9,7 @@ The Stoics believed that tranquility and focus come through discipline and aware
 WHAT THE APP DOES:
 
 • Daily Stoic quotes – a new thought from Marcus Aurelius, Seneca, or Epictetus every day
-• Daily intention – set one intention for the day and stick to it
+• Intention – set one intention for the day and stick to it
 • Unlock counter – see how many times you've picked up your phone. Less is more.
 • Screen time tracking – an overview of time spent on your phone
 • Quick app access – choose up to 10 apps you truly need

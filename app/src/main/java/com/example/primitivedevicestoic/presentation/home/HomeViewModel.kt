@@ -15,7 +15,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.Calendar
+import java.text.SimpleDateFormat
+import java.util.*
 
 class HomeViewModel(
     private val repository: UsageRepository,
@@ -36,12 +37,6 @@ class HomeViewModel(
 
     private val _selectedApps = MutableStateFlow<List<AppInfo>>(emptyList())
     val selectedApps: StateFlow<List<AppInfo>> = _selectedApps.asStateFlow()
-
-    private val _isReminderEnabled = MutableStateFlow(false)
-    val isReminderEnabled: StateFlow<Boolean> = _isReminderEnabled.asStateFlow()
-
-    private val _reminderTime = MutableStateFlow("21:00")
-    val reminderTime: StateFlow<String> = _reminderTime.asStateFlow()
 
     private val _isEditorMode = MutableStateFlow(false)
     val isEditorMode: StateFlow<Boolean> = _isEditorMode.asStateFlow()
@@ -67,11 +62,17 @@ class HomeViewModel(
     private val _intention = MutableStateFlow("")
     val intention: StateFlow<String> = _intention.asStateFlow()
 
-    private val _sleepTime = MutableStateFlow("23:00")
+    private val _currentTime = MutableStateFlow("")
+    val currentTime: StateFlow<String> = _currentTime.asStateFlow()
+
+    private val _currentDate = MutableStateFlow("")
+    val currentDate: StateFlow<String> = _currentDate.asStateFlow()
+
+    private val _sleepTime = MutableStateFlow(repository.getSleepTime())
     val sleepTime: StateFlow<String> = _sleepTime.asStateFlow()
 
-    private val _timeUntilSleep = MutableStateFlow("")
-    val timeUntilSleep: StateFlow<String> = _timeUntilSleep.asStateFlow()
+    private val _timeUntilSleep = MutableStateFlow<String?>(null)
+    val timeUntilSleep: StateFlow<String?> = _timeUntilSleep.asStateFlow()
 
     private val _todayUnlockCount = MutableStateFlow(0)
     val todayUnlockCount: StateFlow<Int> = _todayUnlockCount.asStateFlow()
@@ -129,15 +130,11 @@ class HomeViewModel(
     }
 
     fun loadData() {
-        _isReminderEnabled.value = repository.getReminderEnabled()
-        _reminderTime.value = repository.getReminderTime()
         _isOfflineMode.value = repository.isOfflineMode()
         _birthDate.value = repository.getBirthDate()
         _intention.value = repository.getIntention()
-        _sleepTime.value = repository.getSleepTime()
         calculateDaysAlive()
         calculateHoursRemaining()
-        calculateTimeUntilSleep()
         
         viewModelScope.launch {
             repository.getUnlockEvents().collect {
@@ -164,26 +161,10 @@ class HomeViewModel(
             val current = _selectedApps.value.map { it.packageName }.toMutableList()
             if (current.contains(app.packageName)) {
                 current.remove(app.packageName)
-            } else if (current.size < 10) {
+            } else if (current.size < 8) {
                 current.add(app.packageName)
             }
             repository.saveSelectedApps(current)
-        }
-    }
-
-    fun setReminderEnabled(enabled: Boolean) {
-        viewModelScope.launch {
-            repository.saveReminderEnabled(enabled)
-            _isReminderEnabled.value = enabled
-            com.example.primitivedevicestoic.data.local.ReminderReceiver().scheduleReminder(context)
-        }
-    }
-
-    fun setReminderTime(time: String) {
-        viewModelScope.launch {
-            repository.saveReminderTime(time)
-            _reminderTime.value = time
-            com.example.primitivedevicestoic.data.local.ReminderReceiver().scheduleReminder(context)
         }
     }
 
@@ -271,12 +252,10 @@ class HomeViewModel(
             repository.saveSleepTime(time)
             _sleepTime.value = time
             calculateTimeUntilSleep()
-            // Zde by bylo dobré také přeplánovat notifikaci retrospektivy
-            com.example.primitivedevicestoic.data.local.ReminderReceiver().scheduleReminder(context)
         }
     }
 
-    private fun rotateQuote() {
+    fun rotateQuote() {
         val quotes = listOf(
             "Máš kontrolu jen nad svým jednáním.",
             "Nepotřebuješ reagovat okamžitě.",
@@ -296,11 +275,13 @@ class HomeViewModel(
     }
 
     private fun calculateTimeUntilSleep() {
-        val sleepTimeStr = _sleepTime.value
-        val parts = sleepTimeStr.split(":")
-        val sleepHour = parts.getOrNull(0)?.toIntOrNull() ?: 23
-        val sleepMinute = parts.getOrNull(1)?.toIntOrNull() ?: 0
-
+        val sleepStr = _sleepTime.value
+        val parts = sleepStr.split(":")
+        if (parts.size != 2) return
+        
+        val sleepHour = parts[0].toIntOrNull() ?: return
+        val sleepMinute = parts[1].toIntOrNull() ?: return
+        
         val now = Calendar.getInstance()
         val sleepTime = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, sleepHour)
@@ -308,21 +289,23 @@ class HomeViewModel(
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
-
-        if (now.after(sleepTime)) {
-            // Pokud už je po čase spánku dnes, počítáme do zítřejšího času spánku? 
-            // Nebo prostě ukážeme 0? Zadání říká "do konce dne zbývá X hodin a minut do spánku".
-            // Pokud už spím, tak asi 0.
-            _timeUntilSleep.value = "0h 0m"
-            return
+        
+        if (sleepTime.before(now)) {
+            sleepTime.add(Calendar.DAY_OF_YEAR, 1)
+        }
+        
+        val diffMs = sleepTime.timeInMillis - now.timeInMillis
+        val diffMinutes = diffMs / (1000 * 60)
+        
+        if (diffMinutes > 1440) { // Více než 24h by nemělo nastat díky add(DAY, 1)
+             _timeUntilSleep.value = null
+             return
         }
 
-        val diffMs = sleepTime.timeInMillis - now.timeInMillis
-        val diffMinutesTotal = diffMs / (1000 * 60)
-        val hours = diffMinutesTotal / 60
-        val minutes = diffMinutesTotal % 60
-
-        _timeUntilSleep.value = "${hours}h ${minutes}m"
+        val hours = diffMinutes / 60
+        val minutes = diffMinutes % 60
+        
+        _timeUntilSleep.value = if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
     }
 
     private fun calculateTimeSinceLastUse(events: List<UnlockEvent>) {
@@ -345,10 +328,18 @@ class HomeViewModel(
         _screenTimeMinutes.value = repository.getScreenTimeMinutes()
         _batteryPercentage.value = getBatteryLevel()
         updateTodayUnlockCount(_unlockEvents.value)
+        updateTimeAndDate()
         calculateDaysAlive()
         calculateHoursRemaining()
         calculateTimeUntilSleep()
         calculateTimeSinceLastUse(_unlockEvents.value)
+    }
+
+    private fun updateTimeAndDate() {
+        val now = Calendar.getInstance().time
+        _currentTime.value = SimpleDateFormat("HH:mm", Locale.getDefault()).format(now)
+        val dateStr = SimpleDateFormat("EEEE d.M.yyyy", Locale.getDefault()).format(now)
+        _currentDate.value = dateStr
     }
 
     fun fullRefresh() {

@@ -18,15 +18,23 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
+import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.material3.TimePicker
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -42,8 +50,16 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.example.primitivedevicestoic.R
 import com.example.primitivedevicestoic.domain.model.AppInfo
 import org.koin.androidx.compose.koinViewModel
+import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Pattern
+
+private fun String.removeDiacritics(): String {
+    val normalized = Normalizer.normalize(this, Normalizer.Form.NFD)
+    val pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+")
+    return pattern.matcher(normalized).replaceAll("")
+}
 
 private data class AnswerData(val text: String, val correct: Boolean)
 private data class QuestionData(val question: String, val answers: List<AnswerData>)
@@ -135,15 +151,15 @@ fun HomeScreen(
     val apps by viewModel.apps.collectAsState()
     val selectedApps by viewModel.selectedApps.collectAsState()
     val isEditorMode by viewModel.isEditorMode.collectAsState()
-    val isReminderEnabled by viewModel.isReminderEnabled.collectAsState()
-    val reminderTime by viewModel.reminderTime.collectAsState()
     val daysAlive by viewModel.daysAlive.collectAsState()
     val birthDate by viewModel.birthDate.collectAsState()
     val quote by viewModel.quote.collectAsState()
     val intention by viewModel.intention.collectAsState()
+    val currentTime by viewModel.currentTime.collectAsState()
+    val currentDate by viewModel.currentDate.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
     val sleepTime by viewModel.sleepTime.collectAsState()
     val timeUntilSleep by viewModel.timeUntilSleep.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
     val isDefaultLauncher by viewModel.isDefaultLauncher.collectAsState()
 
     var showIntentionEdit by remember { mutableStateOf(false) }
@@ -155,9 +171,10 @@ fun HomeScreen(
         derivedStateOf { selectedApps.map { it.packageName }.toSet() }
     }
 
-    var showAppList by remember { mutableStateOf(false) }
-    var isSelectionMode by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+    var isSearchActive by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -206,16 +223,74 @@ fun HomeScreen(
                 .padding(bottom = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Citát
-            Text(
-                text = "\u201E$quote\u201C",
-                style = MaterialTheme.typography.bodySmall.copy(fontStyle = FontStyle.Italic),
-                color = Color.Black.copy(alpha = 0.5f),
-                textAlign = TextAlign.Center,
+            // Horní řada: Čas/Datum a Statistiky
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 18.dp, bottom = 16.dp)
-            )
+                    .padding(top = 16.dp, bottom = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Čas a Datum
+                Column {
+                    Text(
+                        text = currentTime,
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 48.sp
+                        ),
+                        color = Color.Black
+                    )
+                    Text(
+                        text = currentDate,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Light
+                        ),
+                        color = Color.Black.copy(alpha = 0.6f)
+                    )
+                }
+
+                // Statistiky (pod sebou)
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    daysAlive?.let {
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = "DNÍ NAŽIVU",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    letterSpacing = 1.sp,
+                                    fontSize = 12.sp
+                                ),
+                                color = Color.Black.copy(alpha = 0.6f)
+                            )
+                            Text(
+                                text = "$it",
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Light, fontSize = 16.sp),
+                                color = Color.Black
+                            )
+                        }
+                    }
+                    timeUntilSleep?.let {
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = "DO SPÁNKU",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    letterSpacing = 1.sp,
+                                    fontSize = 12.sp
+                                ),
+                                color = Color.Black.copy(alpha = 0.6f)
+                            )
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Light, fontSize = 16.sp),
+                                color = Color.Black
+                            )
+                        }
+                    }
+                }
+            }
 
             HorizontalDivider(color = subtleWhite, thickness = 0.5.dp)
 
@@ -227,22 +302,24 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "ZÁMĚR DNE",
+                    text = "ZÁMĚR",
                     style = MaterialTheme.typography.labelSmall.copy(
                         letterSpacing = 2.sp,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 14.sp
                     ),
-                    color = Color.Black.copy(alpha = 0.32f)
+                    color = Color.Black.copy(alpha = 0.6f)
                 )
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 if (showIntentionEdit) {
                     TextField(
                         value = intentionText,
                         onValueChange = { intentionText = it },
                         modifier = Modifier.fillMaxWidth(),
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        textStyle = MaterialTheme.typography.headlineSmall.copy(
                             textAlign = TextAlign.Center,
-                            color = Color.Black
+                            color = Color.Black,
+                            fontWeight = FontWeight.Light
                         ),
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
@@ -269,8 +346,8 @@ fun HomeScreen(
                 } else {
                     Text(
                         text = intention.ifEmpty { "Nastav svůj záměr..." },
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Light),
-                        color = if (intention.isEmpty()) Color.Black.copy(alpha = 0.28f) else Color.Black,
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Light),
+                        color = if (intention.isEmpty()) Color.Black.copy(alpha = 0.5f) else Color.Black,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -282,116 +359,195 @@ fun HomeScreen(
 
             HorizontalDivider(color = subtleWhite, thickness = 0.5.dp)
 
-            // Statistiky
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 13.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(
-                        text = "DO SPÁNKU",
-                        style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.5.sp),
-                        color = Color.Black.copy(alpha = 0.32f)
-                    )
-                    Text(
-                        text = timeUntilSleep,
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Light),
-                        color = Color.Black
-                    )
-                }
-                daysAlive?.let {
-                    Column(
-                        horizontalAlignment = Alignment.End,
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
-                    ) {
-                        Text(
-                            text = "DNÍ NAŽIVU",
-                            style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.5.sp),
-                            color = Color.Black.copy(alpha = 0.32f)
-                        )
-                        Text(
-                            text = "$it",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Light),
-                            color = Color.Black
-                        )
-                    }
-                }
-            }
-
-            HorizontalDivider(color = subtleWhite, thickness = 0.5.dp)
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            // Oblast aplikací
+            // Oblast aplikací (Vertical Carousel nebo Search Results)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .clip(RoundedCornerShape(18.dp))
-                    .border(0.5.dp, subtleWhite, RoundedCornerShape(18.dp))
+                    .weight(0.3f),
+                contentAlignment = Alignment.Center
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 8.dp, vertical = 12.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        verticalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        repeat(2) { row ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
+                Column(modifier = Modifier.fillMaxSize()) {
+                    if (isSearchActive) {
+                        // Search Bar Area uvnitř oblasti aplikací, když je aktivní
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            TextField(
+                                value = searchQuery,
+                                onValueChange = { viewModel.setSearchQuery(it) },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .focusRequester(focusRequester),
+                                placeholder = {
+                                    Text(
+                                        stringResource(R.string.what_looking_for),
+                                        color = Color.Black.copy(alpha = 0.4f),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                },
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    cursorColor = Color.Black,
+                                    focusedIndicatorColor = subtleWhite,
+                                    unfocusedIndicatorColor = Color.Transparent
+                                ),
+                                singleLine = true
+                            )
+                            LaunchedEffect(Unit) {
+                                focusRequester.requestFocus()
+                            }
+                        }
+                        
+                        val filteredApps by remember(apps, searchQuery) {
+                            derivedStateOf {
+                                val normalizedQuery = searchQuery.removeDiacritics()
+                                apps.filter { it.label.removeDiacritics().contains(normalizedQuery, ignoreCase = true) }
+                                    .sortedBy { it.label.lowercase() }
+                            }
+                        }
+                        LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                            items(items = filteredApps, key = { it.packageName }) { app ->
+                                val isSelected = selectedPackageNames.contains(app.packageName)
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            try {
+                                                val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
+                                                if (intent != null) {
+                                                    context.startActivity(intent)
+                                                    isSearchActive = false
+                                                    viewModel.setSearchQuery("")
+                                                }
+                                            } catch (e: Exception) {}
+                                        }
+                                        .padding(vertical = 12.dp, horizontal = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = app.label,
+                                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Light),
+                                        color = Color.Black.copy(alpha = 0.85f),
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    IconButton(onClick = { viewModel.toggleAppSelection(app) }) {
+                                        Icon(
+                                            imageVector = if (isSelected) Icons.Default.Close else Icons.Default.Add,
+                                            contentDescription = if (isSelected) "Remove from home" else "Add to home",
+                                            tint = Color.Black.copy(alpha = 0.5f)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    } else if (selectedApps.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(60.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(subtleWhite)
+                                    .clickable {
+                                        isSearchActive = true
+                                    },
+                                contentAlignment = Alignment.Center
                             ) {
-                                repeat(5) { col ->
-                                    val index = row * 5 + col
-                                    val app = selectedApps.getOrNull(index)
-                                    GridAppItem(
-                                        app = app,
-                                        onClick = {
-                                            if (app != null) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = stringResource(R.string.add_app),
+                                    tint = Color.Black.copy(alpha = 0.5f)
+                                )
+                            }
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            selectedApps.forEach { app ->
+                                val itemHeight = 40.dp
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(itemHeight)
+                                        .combinedClickable(
+                                            onClick = {
                                                 try {
                                                     val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
                                                     if (intent != null) context.startActivity(intent)
                                                 } catch (e: Exception) {}
-                                            } else {
-                                                isSelectionMode = true
-                                                showAppList = true
-                                            }
-                                        },
-                                        onLongClick = {
-                                            if (app != null) {
+                                            },
+                                            onLongClick = {
                                                 viewModel.toggleAppSelection(app)
-                                            } else {
-                                                isSelectionMode = true
-                                                showAppList = true
                                             }
-                                        },
-                                        modifier = Modifier.weight(1f)
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = app.label.uppercase(),
+                                        style = MaterialTheme.typography.bodyLarge.copy(
+                                            letterSpacing = 2.sp,
+                                            fontWeight = FontWeight.Light
+                                        ),
+                                        color = Color.Black,
+                                        textAlign = TextAlign.Center,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
                                     )
                                 }
                             }
                         }
                     }
+                }
+            }
 
-                    TextButton(
-                        onClick = { showAppList = true },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 2.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.app_list),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = Color.Black.copy(alpha = 0.28f)
-                        )
+            // Spodní tlačítka
+            Row(
+                modifier = Modifier.padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Ikona telefonu
+                IconButton(
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_CALL_BUTTON)
+                        context.startActivity(intent)
                     }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Phone,
+                        contentDescription = "Open dialer",
+                        tint = Color.Black.copy(alpha = 0.6f)
+                    )
+                }
+
+                // Search ikona
+                IconButton(
+                    onClick = {
+                        if (isSearchActive) {
+                            isSearchActive = false
+                            viewModel.setSearchQuery("")
+                        } else {
+                            isSearchActive = true
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = if (isSearchActive) Icons.Default.Close else Icons.Default.Search,
+                        contentDescription = if (isSearchActive) "Close search" else "Search apps",
+                        tint = Color.Black.copy(alpha = 0.6f)
+                    )
                 }
             }
         }
@@ -400,7 +556,7 @@ fun HomeScreen(
     if (isEditorMode) {
         AlertDialog(
             onDismissRequest = { viewModel.setEditorMode(false) },
-            containerColor = Color(0xFF111111),
+            containerColor = Color.White,
             titleContentColor = Color.Black,
             textContentColor = Color.Black.copy(alpha = 0.8f),
             shape = RoundedCornerShape(20.dp),
@@ -412,51 +568,6 @@ fun HomeScreen(
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    SettingsRow(label = stringResource(R.string.evening_reminder)) {
-                        Switch(
-                            checked = isReminderEnabled,
-                            onCheckedChange = { viewModel.setReminderEnabled(it) },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.Black,
-                                checkedTrackColor = Color.Black,
-                                uncheckedThumbColor = Color.Black.copy(0.4f),
-                                uncheckedTrackColor = Color.Black.copy(0.1f)
-                            )
-                        )
-                    }
-                    if (isReminderEnabled) {
-                        SettingsRow(label = stringResource(R.string.reminder_time)) {
-                            Text(
-                                text = reminderTime,
-                                modifier = Modifier
-                                    .clickable {
-                                        val next = if (reminderTime == "21:00") "22:00" else "21:00"
-                                        viewModel.setReminderTime(next)
-                                    }
-                                    .padding(8.dp),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = Color.Black
-                            )
-                        }
-                    }
-                    SettingsRow(label = "Čas spánku") {
-                        Text(
-                            text = sleepTime,
-                            modifier = Modifier
-                                .clickable {
-                                    val next = when (sleepTime) {
-                                        "21:00" -> "22:00"
-                                        "22:00" -> "23:00"
-                                        "23:00" -> "00:00"
-                                        else -> "21:00"
-                                    }
-                                    viewModel.setSleepTime(next)
-                                }
-                                .padding(8.dp),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.Black
-                        )
-                    }
                     SettingsRow(label = stringResource(R.string.birth_date)) {
                         Text(
                             text = birthDate?.let {
@@ -464,6 +575,16 @@ fun HomeScreen(
                             } ?: stringResource(R.string.set_label),
                             modifier = Modifier
                                 .clickable { showDatePicker = true }
+                                .padding(8.dp),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.Black
+                        )
+                    }
+                    SettingsRow(label = stringResource(R.string.sleep_time_label)) {
+                        Text(
+                            text = sleepTime,
+                            modifier = Modifier
+                                .clickable { showTimePicker = true }
                                 .padding(8.dp),
                             style = MaterialTheme.typography.bodyLarge,
                             color = Color.Black
@@ -489,6 +610,17 @@ fun HomeScreen(
                             Text(stringResource(R.string.set_as_default))
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+                    val versionName = packageInfo.versionName ?: "1.0"
+                    Text(
+                        text = "v$versionName",
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.Black.copy(alpha = 0.3f),
+                        textAlign = TextAlign.Center
+                    )
                 }
             },
             confirmButton = {
@@ -519,89 +651,37 @@ fun HomeScreen(
         }
     }
 
-    if (showAppList) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                showAppList = false
-                isSelectionMode = false
-                viewModel.setSearchQuery("")
+    if (showTimePicker) {
+        val parts = sleepTime.split(":")
+        val initialHour = parts.getOrNull(0)?.toIntOrNull() ?: 22
+        val initialMinute = parts.getOrNull(1)?.toIntOrNull() ?: 0
+        val timePickerState = rememberTimePickerState(
+            initialHour = initialHour,
+            initialMinute = initialMinute,
+            is24Hour = true
+        )
+        
+        AlertDialog(
+            onDismissRequest = { showTimePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.setSleepTime(String.format("%02d:%02d", timePickerState.hour, timePickerState.minute))
+                    showTimePicker = false
+                }) { Text("OK") }
             },
-            containerColor = Color(0xFF111111),
-            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-        ) {
-            val sortedApps by remember(apps, searchQuery) {
-                derivedStateOf {
-                    apps.filter { it.label.contains(searchQuery, ignoreCase = true) }
-                        .sortedBy { it.label.lowercase() }
+            dismissButton = {
+                TextButton(onClick = { showTimePicker = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+            containerColor = Color.White,
+            titleContentColor = Color.Black,
+            text = {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    TimePicker(state = timePickerState)
                 }
             }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.8f)
-                    .padding(horizontal = 16.dp)
-            ) {
-                TextField(
-                    value = searchQuery,
-                    onValueChange = { viewModel.setSearchQuery(it) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    placeholder = {
-                        Text(stringResource(R.string.what_looking_for), color = Color.Black.copy(alpha = 0.35f))
-                    },
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        cursorColor = Color.Black,
-                        focusedIndicatorColor = Color.Black.copy(alpha = 0.3f),
-                        unfocusedIndicatorColor = Color.Black.copy(alpha = 0.15f)
-                    ),
-                    singleLine = true
-                )
-                LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                    items(items = sortedApps, key = { it.packageName }) { app ->
-                        val isSelected = selectedPackageNames.contains(app.packageName)
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    if (isSelectionMode) {
-                                        viewModel.toggleAppSelection(app)
-                                    } else {
-                                        try {
-                                            val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
-                                            if (intent != null) {
-                                                context.startActivity(intent)
-                                                showAppList = false
-                                                viewModel.setSearchQuery("")
-                                            }
-                                        } catch (e: Exception) {}
-                                    }
-                                }
-                                .padding(vertical = 13.dp, horizontal = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = app.label,
-                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Light),
-                                color = if (isSelected && isSelectionMode) Color.Black else Color.Black.copy(alpha = 0.85f),
-                                modifier = Modifier.weight(1f)
-                            )
-                            if (isSelectionMode && isSelected) {
-                                Text(
-                                    stringResource(R.string.selected),
-                                    color = Color.Black.copy(alpha = 0.5f),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        )
     }
 }
 
@@ -614,47 +694,7 @@ private fun SettingsRow(label: String, content: @Composable () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, style = MaterialTheme.typography.bodyMedium, color = Color.Black.copy(alpha = 0.75f))
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = Color.Black.copy(alpha = 0.85f))
         content()
-    }
-}
-
-@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
-@Composable
-fun GridAppItem(
-    app: AppInfo?,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-            .padding(vertical = 4.dp, horizontal = 2.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .size(52.dp)
-                .background(if (app == null) Color.Black.copy(alpha = 0.06f) else Color.Transparent),
-            contentAlignment = Alignment.Center
-        ) {
-            if (app?.icon != null) {
-                Image(
-                    bitmap = app.icon.toBitmap().asImageBitmap(),
-                    contentDescription = app.label,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
-                )
-            } else if (app == null) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_app),
-                    tint = Color.Black.copy(alpha = 0.25f),
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
     }
 }

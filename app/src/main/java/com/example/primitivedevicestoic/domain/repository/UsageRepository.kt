@@ -11,16 +11,12 @@ interface UsageRepository {
     fun getScreenTimeMinutes(): Long
     fun getSelectedApps(): Flow<List<String>>
     suspend fun saveSelectedApps(packageNames: List<String>)
-    fun getReminderEnabled(): Boolean
-    suspend fun saveReminderEnabled(enabled: Boolean)
-    fun getReminderTime(): String // "HH:mm"
-    suspend fun saveReminderTime(time: String)
     fun isOfflineMode(): Boolean
     suspend fun setOfflineMode(enabled: Boolean)
     fun getBirthDate(): Long?
     suspend fun saveBirthDate(timestamp: Long)
     fun getIntention(): String
     suspend fun saveIntention(intention: String)
-    fun getSleepTime(): String // "HH:mm"
+    fun getSleepTime(): String
     suspend fun saveSleepTime(time: String)
 }

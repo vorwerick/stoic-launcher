@@ -38,7 +38,7 @@ fun MainContent(viewModel: WelcomeViewModel = koinViewModel()) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = com.example.primitivedevicestoic.ui.theme.Black
+        containerColor = com.example.primitivedevicestoic.ui.theme.White
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -70,8 +70,9 @@ class MainActivity : ComponentActivity() {
                 com.example.primitivedevicestoic.ui.theme.White.toArgb(),
                 com.example.primitivedevicestoic.ui.theme.White.toArgb()
             ),
-            navigationBarStyle = SystemBarStyle.dark(
-                com.example.primitivedevicestoic.ui.theme.Black.toArgb()
+            navigationBarStyle = SystemBarStyle.light(
+                com.example.primitivedevicestoic.ui.theme.White.toArgb(),
+                com.example.primitivedevicestoic.ui.theme.White.toArgb()
             )
         )
         setContent {

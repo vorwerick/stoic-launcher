@@ -33,18 +33,6 @@ class UsageRepositoryImpl(
         _selectedApps.value = limited
         prefs.edit().putString("selected_apps", limited.joinToString(",")).apply()
     }
-
-    override fun getReminderEnabled(): Boolean = prefs.getBoolean("reminder_enabled", false)
-
-    override suspend fun saveReminderEnabled(enabled: Boolean) {
-        prefs.edit().putBoolean("reminder_enabled", enabled).apply()
-    }
-
-    override fun getReminderTime(): String = prefs.getString("reminder_time", "21:00") ?: "21:00"
-
-    override suspend fun saveReminderTime(time: String) {
-        prefs.edit().putString("reminder_time", time).apply()
-    }
     
     override fun isOfflineMode(): Boolean = prefs.getBoolean("offline_mode", false)
 
@@ -67,7 +55,7 @@ class UsageRepositoryImpl(
         prefs.edit().putString("today_intention", intention).apply()
     }
 
-    override fun getSleepTime(): String = prefs.getString("sleep_time", "23:00") ?: "23:00"
+    override fun getSleepTime(): String = prefs.getString("sleep_time", "22:00") ?: "22:00"
 
     override suspend fun saveSleepTime(time: String) {
         prefs.edit().putString("sleep_time", time).apply()

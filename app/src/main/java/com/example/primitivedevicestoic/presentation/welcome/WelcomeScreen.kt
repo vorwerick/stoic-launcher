@@ -48,7 +48,7 @@ fun WelcomeScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = Color.Black,
+        containerColor = Color.White,
         topBar = {
             Spacer(
                 modifier = Modifier
@@ -69,38 +69,52 @@ fun WelcomeScreen(
             Text(
                 text = stringResource(R.string.welcome_title),
                 style = MaterialTheme.typography.headlineMedium,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = Color.Black
             )
             
             Spacer(modifier = Modifier.height(16.dp))
             
             Text(
                 text = stringResource(R.string.welcome_description),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = Color.Black
             )
             
             Spacer(modifier = Modifier.height(32.dp))
 
             if (!isDefault) {
-                Button(onClick = {
-                    val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // Android 10+
-                        val roleManager = context.getSystemService(RoleManager::class.java)
-                        if (roleManager != null && roleManager.isRoleAvailable(RoleManager.ROLE_HOME)) {
-                            roleManager.createRequestRoleIntent(RoleManager.ROLE_HOME)
+                Button(
+                    onClick = {
+                        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // Android 10+
+                            val roleManager = context.getSystemService(RoleManager::class.java)
+                            if (roleManager != null && roleManager.isRoleAvailable(RoleManager.ROLE_HOME)) {
+                                roleManager.createRequestRoleIntent(RoleManager.ROLE_HOME)
+                            } else {
+                                Intent(Settings.ACTION_HOME_SETTINGS)
+                            }
                         } else {
                             Intent(Settings.ACTION_HOME_SETTINGS)
                         }
-                    } else {
-                        Intent(Settings.ACTION_HOME_SETTINGS)
-                    }
-                    launcher.launch(intent)
-                }) {
+                        launcher.launch(intent)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black,
+                        contentColor = Color.White
+                    )
+                ) {
                     Text(stringResource(R.string.set_as_default))
                 }
             } else {
                 Text(stringResource(R.string.already_set_as_default), color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = onContinue) {
+                Button(
+                    onClick = onContinue,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black,
+                        contentColor = Color.White
+                    )
+                ) {
                     Text(stringResource(R.string.continue_label))
                 }
             }
