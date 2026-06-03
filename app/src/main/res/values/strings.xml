@@ -32,4 +32,11 @@
     <string name="already_set_as_default">✅ Set as default</string>
     <string name="continue_label">Continue</string>
     <string name="rate_app">Rate app</string>
+    <string name="days_alive_label">alive</string>
+    <string name="days_unit_one">day</string>
+    <string name="days_unit_few">days</string>
+    <string name="days_unit_other">days</string>
+    <string name="until_sleep_label">until sleep</string>
+    <string name="editor_tip">Tip: long press anywhere for settings</string>
+    <string name="set_intention_hint">Set your intention...</string>
 </resources>

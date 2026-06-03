@@ -301,99 +301,109 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 22.dp)
-                .padding(bottom = 20.dp),
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Horní řada: Čas/Datum a Statistiky
+            // Horní řada: Čas/Do spánku a Datum/Dny naživu
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 16.dp),
+                    .padding(top = 24.dp, bottom = 24.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Bottom
             ) {
-                // Čas a Datum
+                // Levá strana: Datum a Dny naživu
                 Column(horizontalAlignment = Alignment.Start) {
                     Text(
-                        text = currentTime,
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 48.sp
+                        text = currentDate.uppercase(),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Light,
+                            fontSize = 20.sp,
+                            letterSpacing = 0.5.sp
                         ),
-                        color = themeFg,
-                        modifier = Modifier.offset(x = (-2).dp) // Korekce pro vizuální zarovnání s lehčím textem pod ním
+                        color = secondaryText,
+                        textAlign = TextAlign.Start
                     )
-                    Text(
-                        text = currentDate,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.Light
-                        ),
-                        color = secondaryText
-                    )
+                    daysAlive?.let {
+                        val daysUnit = when {
+                            it == 1L -> stringResource(R.string.days_unit_one)
+                            it % 10 in 2..4 && (it % 100 < 10 || it % 100 >= 20) -> stringResource(R.string.days_unit_few)
+                            else -> stringResource(R.string.days_unit_other)
+                        }
+                        Text(
+                            text = stringResource(R.string.days_alive_label).lowercase(),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 10.sp,
+                                letterSpacing = 1.sp
+                            ),
+                            color = secondaryText,
+                            textAlign = TextAlign.Start
+                        )
+                        Text(
+                            text = "$it $daysUnit",
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                fontWeight = FontWeight.Light,
+                                fontSize = 32.sp,
+                                letterSpacing = (-0.5).sp
+                            ),
+                            color = themeFg,
+                            textAlign = TextAlign.Start,
+                            modifier = Modifier.offset(y = (-4).dp)
+                        )
+                    }
                 }
 
-                // Statistiky (pod sebou)
-                Column(
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    daysAlive?.let {
-                        Column(horizontalAlignment = Alignment.End) {
-                            Text(
-                                text = "DNÍ NAŽIVU",
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    letterSpacing = 1.sp,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                color = themeFg
-                            )
-                            Text(
-                                text = "$it",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.Normal,
-                                    fontSize = 18.sp
-                                ),
-                                color = themeFg
-                            )
-                        }
-                    }
+                // Pravá strana: Čas a Do spánku
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = currentTime,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Light,
+                            fontSize = 20.sp,
+                            letterSpacing = 0.5.sp
+                        ),
+                        color = secondaryText,
+                        textAlign = TextAlign.End
+                    )
                     timeUntilSleep?.let {
-                        Column(horizontalAlignment = Alignment.End) {
-                            Text(
-                                text = "DO SPÁNKU",
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    letterSpacing = 1.sp,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                color = themeFg
-                            )
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.Normal,
-                                    fontSize = 18.sp
-                                ),
-                                color = themeFg
-                            )
-                        }
+                        Text(
+                            text = stringResource(R.string.until_sleep_label).lowercase(),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 10.sp,
+                                letterSpacing = 1.sp
+                            ),
+                            color = secondaryText,
+                            textAlign = TextAlign.End
+                        )
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                fontWeight = FontWeight.Light,
+                                fontSize = 32.sp,
+                                letterSpacing = (-0.5).sp
+                            ),
+                            color = themeFg,
+                            textAlign = TextAlign.End,
+                            modifier = Modifier.offset(y = (-4).dp)
+                        )
                     }
                 }
             }
 
-            HorizontalDivider(color = subtleColor, thickness = 0.5.dp)
+            HorizontalDivider(color = subtleColor, thickness = 1.dp)
 
             if (showEditorTip && !isEditorMode) {
                 Text(
-                    text = "Tip: podrž dlouze kamkoliv pro nastavení",
+                    text = stringResource(R.string.editor_tip),
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontStyle = FontStyle.Italic,
                         fontWeight = FontWeight.Light
                     ),
                     color = hintText,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(vertical = 12.dp)
                 )
             }
 
@@ -401,19 +411,19 @@ fun HomeScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 14.dp),
+                    .padding(vertical = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "ZÁMĚR",
+                    text = stringResource(R.string.intention).lowercase(),
                     style = MaterialTheme.typography.labelSmall.copy(
-                        letterSpacing = 2.sp,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 14.sp
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 10.sp,
+                        letterSpacing = 1.sp
                     ),
                     color = secondaryText
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 if (showIntentionEdit) {
                     TextField(
                         value = intentionText,
@@ -430,32 +440,32 @@ fun HomeScreen(
                             focusedTextColor = themeFg,
                             unfocusedTextColor = themeFg,
                             cursorColor = themeFg,
-                            focusedIndicatorColor = subtleColor,
+                            focusedIndicatorColor = themeFg,
                             unfocusedIndicatorColor = subtleColor
                         ),
                         singleLine = true
                     )
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     TextButton(onClick = {
                         viewModel.saveIntention(intentionText)
                         showIntentionEdit = false
                     }) {
                         Text(
                             stringResource(R.string.set_label),
-                            color = secondaryText,
-                            style = MaterialTheme.typography.labelLarge
+                            color = themeFg,
+                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
                         )
                     }
                 } else {
                     Text(
-                        text = intention.ifEmpty { "Nastav svůj záměr..." },
+                        text = intention.ifEmpty { stringResource(R.string.set_intention_hint) },
                         style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Light),
                         color = if (intention.isEmpty()) hintText else themeFg,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { showIntentionEdit = true }
-                            .padding(horizontal = 8.dp)
+                            .padding(horizontal = 16.dp)
                     )
                 }
             }
@@ -470,13 +480,17 @@ fun HomeScreen(
                 contentAlignment = Alignment.Center
             ) {
                 if (selectedApps.isEmpty()) {
-                    Box(
+                    Text(
+                        text = stringResource(R.string.add_app).uppercase(),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            letterSpacing = 2.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = secondaryText,
                         modifier = Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-
-                    }
+                            .clickable { isSearchActive = true }
+                            .padding(16.dp)
+                    )
                 } else {
                     Column(
                         modifier = Modifier.fillMaxSize(),
@@ -484,7 +498,7 @@ fun HomeScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
                         selectedApps.forEach { app ->
-                            val itemHeight = 40.dp
+                            val itemHeight = 48.dp
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -508,8 +522,8 @@ fun HomeScreen(
                             ) {
                                 Text(
                                     text = app.label.uppercase(),
-                                    style = MaterialTheme.typography.bodyLarge.copy(
-                                        letterSpacing = 2.sp,
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        letterSpacing = 3.sp,
                                         fontWeight = FontWeight.Light
                                     ),
                                     color = themeFg,
@@ -526,8 +540,14 @@ fun HomeScreen(
             // Spodní tlačítka
             if (!isSearchActive) {
                 Row(
-                    modifier = Modifier.padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .background(
+                            color = themeFg.copy(alpha = 0.05f),
+                            shape = RoundedCornerShape(24.dp)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(24.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Přepínač Dark Mode
@@ -536,8 +556,9 @@ fun HomeScreen(
                     ) {
                         Icon(
                             if (isDarkMode) Icons.Filled.LightMode else Icons.Filled.DarkMode,
-                            contentDescription = null,
-                            tint = secondaryText
+                            contentDescription = "Toggle dark mode",
+                            tint = secondaryText,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
 
@@ -551,28 +572,22 @@ fun HomeScreen(
                         Icon(
                             imageVector = Icons.Default.Phone,
                             contentDescription = "Open dialer",
-                            tint = secondaryText
+                            tint = secondaryText,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
-
-
 
                     // Search ikona
                     IconButton(
                         onClick = {
                             isSearchActive = true
-                        },
-                        modifier = if (selectedApps.isEmpty()) {
-                            Modifier.background(
-                                color = themeFg.copy(alpha = 0.1f),
-                                shape = androidx.compose.foundation.shape.CircleShape
-                            )
-                        } else Modifier
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search apps",
-                            tint = secondaryText
+                            tint = secondaryText,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }
