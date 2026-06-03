@@ -1,7 +1,9 @@
 package com.example.primitivedevicestoic.presentation.home
 
 import android.app.role.RoleManager
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -473,22 +475,7 @@ fun HomeScreen(
                             .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(60.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(subtleColor)
-                                .clickable {
-                                    isSearchActive = true
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = stringResource(R.string.add_app),
-                                tint = secondaryText
-                            )
-                        }
+
                     }
                 } else {
                     Column(
@@ -543,6 +530,17 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Přepínač Dark Mode
+                    IconButton(
+                        onClick = { viewModel.toggleDarkMode() }
+                    ) {
+                        Icon(
+                            if (isDarkMode) Icons.Filled.LightMode else Icons.Filled.DarkMode,
+                            contentDescription = null,
+                            tint = secondaryText
+                        )
+                    }
+
                     // Ikona telefonu
                     IconButton(
                         onClick = {
@@ -557,15 +555,7 @@ fun HomeScreen(
                         )
                     }
 
-                    // Přepínač Dark Mode
-                    IconButton(
-                        onClick = { viewModel.toggleDarkMode() }
-                    ) {
-                        Icon(
-                            if (isDarkMode) Icons.Filled.DarkMode else Icons.Filled.LightMode,
-                            contentDescription = null
-                        )
-                    }
+
 
                     // Search ikona
                     IconButton(
@@ -707,15 +697,15 @@ fun HomeScreen(
             containerColor = themeBg,
             titleContentColor = themeFg,
             textContentColor = themeFg.copy(alpha = 0.8f),
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(28.dp),
             title = {
                 Text(
                     stringResource(R.string.editor_settings),
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Normal)
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Normal)
                 )
             },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     SettingsRow(label = stringResource(R.string.birth_date), themeFg = themeFg) {
                         Text(
                             text = birthDate?.let {
@@ -758,12 +748,46 @@ fun HomeScreen(
                                 launcher.launch(intent)
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(10.dp),
-                            border = BorderStroke(0.5.dp, themeFg.copy(0.4f)),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, themeFg.copy(0.2f)),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = themeFg)
                         ) {
-                            Text(stringResource(R.string.set_as_default))
+                            Text(
+                                stringResource(R.string.set_as_default),
+                                style = MaterialTheme.typography.labelLarge
+                            )
                         }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = {
+                            val packageName = context.packageName
+                            try {
+                                context.startActivity(
+                                    Intent(
+                                        Intent.ACTION_VIEW,
+                                        Uri.parse("market://details?id=$packageName")
+                                    )
+                                )
+                            } catch (e: ActivityNotFoundException) {
+                                context.startActivity(
+                                    Intent(
+                                        Intent.ACTION_VIEW,
+                                        Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+                                    )
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, themeFg.copy(0.2f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = themeFg)
+                    ) {
+                        Text(
+                            stringResource(R.string.rate_app),
+                            style = MaterialTheme.typography.labelLarge
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -773,14 +797,21 @@ fun HomeScreen(
                         text = "v$versionName",
                         modifier = Modifier.fillMaxWidth(),
                         style = MaterialTheme.typography.labelSmall,
-                        color = themeFg.copy(alpha = 0.3f),
+                        color = themeFg.copy(alpha = 0.4f),
                         textAlign = TextAlign.Center
                     )
                 }
             },
             confirmButton = {
-                TextButton(onClick = { viewModel.setEditorMode(false) }) {
-                    Text(stringResource(R.string.close), color = secondaryText)
+                TextButton(
+                    onClick = { viewModel.setEditorMode(false) },
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Text(
+                        stringResource(R.string.close),
+                        color = themeFg,
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                    )
                 }
             }
         )

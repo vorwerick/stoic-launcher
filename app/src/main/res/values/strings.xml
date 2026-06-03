@@ -31,4 +31,5 @@
     <string name="set_as_default">Set as default</string>
     <string name="already_set_as_default">✅ Set as default</string>
     <string name="continue_label">Continue</string>
+    <string name="rate_app">Rate app</string>
 </resources>
