@@ -23,4 +23,8 @@ interface UsageRepository {
     suspend fun setEditorTipShown(shown: Boolean)
     fun isDarkMode(): Boolean
     suspend fun setDarkMode(enabled: Boolean)
+    fun isMottoEnabled(): Boolean
+    suspend fun setMottoEnabled(enabled: Boolean)
+    fun getUsedMottoIndices(): Set<Int>
+    suspend fun saveUsedMottoIndices(indices: Set<Int>)
 }

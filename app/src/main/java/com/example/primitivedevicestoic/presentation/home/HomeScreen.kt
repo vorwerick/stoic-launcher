@@ -52,6 +52,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TimePicker
@@ -84,12 +86,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.primitivedevicestoic.R
+import com.example.primitivedevicestoic.domain.model.AppInfo
 import org.koin.androidx.compose.koinViewModel
 import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.regex.Pattern
+import androidx.core.net.toUri
 
 private fun String.removeDiacritics(): String {
     val normalized = Normalizer.normalize(this, Normalizer.Form.NFD)
@@ -232,6 +236,9 @@ fun HomeScreen(
     val isDefaultLauncher by viewModel.isDefaultLauncher.collectAsState()
     val showEditorTip by viewModel.showEditorTip.collectAsState()
     val isDarkMode by viewModel.isDarkMode.collectAsState()
+    val isMottoEnabled by viewModel.isMottoEnabled.collectAsState()
+    val listMotto by viewModel.listMotto.collectAsState()
+    val currentMottos by viewModel.currentMottos.collectAsState()
 
     val themeBg = if (isDarkMode) Color.Black else Color.White
     val themeFg = if (isDarkMode) Color.White else Color.Black
@@ -335,7 +342,7 @@ fun HomeScreen(
                             text = stringResource(R.string.days_alive_label).lowercase(),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 10.sp,
+                                fontSize = 12.sp,
                                 letterSpacing = 1.sp
                             ),
                             color = secondaryText,
@@ -372,7 +379,7 @@ fun HomeScreen(
                             text = stringResource(R.string.until_sleep_label).lowercase(),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 10.sp,
+                                fontSize = 12.sp,
                                 letterSpacing = 1.sp
                             ),
                             color = secondaryText,
@@ -418,7 +425,7 @@ fun HomeScreen(
                     text = stringResource(R.string.intention).lowercase(),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Bold,
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         letterSpacing = 1.sp
                     ),
                     color = secondaryText
@@ -446,57 +453,106 @@ fun HomeScreen(
                 contentAlignment = Alignment.Center
             ) {
                 if (selectedApps.isEmpty()) {
-                    Text(
-                        text = stringResource(R.string.add_app).uppercase(),
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            letterSpacing = 2.sp,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = secondaryText,
-                        modifier = Modifier
-                            .clickable { isSearchActive = true }
-                            .padding(16.dp)
-                    )
+                    if (isMottoEnabled) {
+                        Text(
+                            text = listMotto.uppercase(),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                letterSpacing = 3.sp,
+                                fontWeight = FontWeight.Light,
+                                fontStyle = FontStyle.Italic
+                            ),
+                            color = themeFg.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(16.dp)
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.add_app).uppercase(),
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                letterSpacing = 2.sp,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = secondaryText,
+                            modifier = Modifier
+                                .clickable { isSearchActive = true }
+                                .padding(16.dp)
+                        )
+                    }
                 } else {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        selectedApps.forEach { app ->
-                            val itemHeight = 48.dp
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(itemHeight)
-                                    .combinedClickable(
-                                        onClick = {
-                                            try {
-                                                val intent =
-                                                    context.packageManager.getLaunchIntentForPackage(
-                                                        app.packageName
-                                                    )
-                                                if (intent != null) context.startActivity(intent)
-                                            } catch (e: Exception) {
+                        val itemsWithMotto = remember(selectedApps, currentMottos, isMottoEnabled) {
+                            val list = mutableListOf<Any>()
+                            if (selectedApps.isNotEmpty()) {
+                                selectedApps.forEachIndexed { index, app ->
+                                    list.add(app)
+                                    // Vložit unikátní motto po každé aplikaci, pokud je povoleno
+                                    if (isMottoEnabled && index < currentMottos.size) {
+                                        list.add(currentMottos[index])
+                                    }
+                                }
+                            }
+                            list
+                        }
+
+                        itemsWithMotto.forEach { item ->
+                            if (item is AppInfo) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(40.dp)
+                                        .combinedClickable(
+                                            onClick = {
+                                                try {
+                                                    val intent =
+                                                        context.packageManager.getLaunchIntentForPackage(
+                                                            item.packageName
+                                                        )
+                                                    if (intent != null) context.startActivity(intent)
+                                                } catch (e: Exception) {
+                                                }
+                                            },
+                                            onLongClick = {
+                                                viewModel.toggleAppSelection(item)
                                             }
-                                        },
-                                        onLongClick = {
-                                            viewModel.toggleAppSelection(app)
-                                        }
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = app.label.uppercase(),
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        letterSpacing = 3.sp,
-                                        fontWeight = FontWeight.Light
-                                    ),
-                                    color = themeFg,
-                                    textAlign = TextAlign.Center,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = item.label.uppercase(),
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            letterSpacing = 3.sp,
+                                            fontWeight = FontWeight.ExtraLight
+                                        ),
+                                        color = themeFg.copy(alpha = 0.7f),
+                                        textAlign = TextAlign.Center,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            } else if (item is String) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(32.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = item.uppercase(),
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            letterSpacing = 3.sp,
+                                            fontWeight = FontWeight.ExtraLight
+                                        ),
+                                        color = themeFg.copy(alpha = 0.7f),
+                                        textAlign = TextAlign.Center,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
                             }
                         }
                     }
@@ -740,6 +796,7 @@ fun HomeScreen(
                         }
                     }
 
+
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedButton(
                         onClick = {
@@ -748,14 +805,14 @@ fun HomeScreen(
                                 context.startActivity(
                                     Intent(
                                         Intent.ACTION_VIEW,
-                                        Uri.parse("market://details?id=$packageName")
+                                        "market://details?id=$packageName".toUri()
                                     )
                                 )
                             } catch (e: ActivityNotFoundException) {
                                 context.startActivity(
                                     Intent(
                                         Intent.ACTION_VIEW,
-                                        Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+                                        "https://play.google.com/store/apps/details?id=$packageName".toUri()
                                     )
                                 )
                             }

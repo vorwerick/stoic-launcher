@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import com.example.primitivedevicestoic.R
 
 class HomeViewModel(
     private val repository: UsageRepository,
@@ -59,6 +60,12 @@ class HomeViewModel(
     private val _quote = MutableStateFlow("")
     val quote: StateFlow<String> = _quote.asStateFlow()
 
+    private val _listMotto = MutableStateFlow("")
+    val listMotto: StateFlow<String> = _listMotto.asStateFlow()
+
+    private val _currentMottos = MutableStateFlow<List<String>>(emptyList())
+    val currentMottos: StateFlow<List<String>> = _currentMottos.asStateFlow()
+
     private val _intention = MutableStateFlow("")
     val intention: StateFlow<String> = _intention.asStateFlow()
 
@@ -92,6 +99,9 @@ class HomeViewModel(
     private val _lockTrigger = MutableStateFlow(0)
     val lockTrigger: StateFlow<Int> = _lockTrigger.asStateFlow()
 
+    private val _isMottoEnabled = MutableStateFlow(repository.isMottoEnabled())
+    val isMottoEnabled: StateFlow<Boolean> = _isMottoEnabled.asStateFlow()
+
     private var updateJob: kotlinx.coroutines.Job? = null
 
     private val batteryReceiver = object : BroadcastReceiver() {
@@ -105,6 +115,7 @@ class HomeViewModel(
         loadData()
         updateDefaultLauncherStatus()
         rotateQuote()
+        rotateListMotto()
     }
 
     fun startPeriodicUpdates() {
@@ -205,6 +216,14 @@ class HomeViewModel(
         }
     }
 
+    fun toggleMottoEnabled() {
+        val newState = !_isMottoEnabled.value
+        _isMottoEnabled.value = newState
+        viewModelScope.launch {
+            repository.setMottoEnabled(newState)
+        }
+    }
+
     fun setBirthDate(timestamp: Long) {
         viewModelScope.launch {
             repository.saveBirthDate(timestamp)
@@ -276,16 +295,51 @@ class HomeViewModel(
     }
 
     fun rotateQuote() {
-        val quotes = listOf(
-            "Máš kontrolu jen nad svým jednáním.",
-            "Nepotřebuješ reagovat okamžitě.",
-            "Vše je pomíjivé.",
-            "Štěstí tvého života závisí na kvalitě tvých myšlenek.",
-            "Nehledej, aby se věci děly tak, jak si přeješ, ale přej si, aby se děly tak, jak se dějí.",
-            "Překážka v konání posouvá konání. To, co stojí v cestě, se stává cestou.",
-            "Čas je jako řeka tvořená událostmi, silný proud."
-        )
+        val quotes = context.resources.getStringArray(R.array.stoic_quotes).toList().distinct()
         _quote.value = quotes.random()
+    }
+
+    fun rotateListMotto() {
+        val mottos = context.resources.getStringArray(R.array.stoic_advice).toList().distinct()
+        
+        val usedIndices = repository.getUsedMottoIndices().toMutableSet()
+        val allIndices = mottos.indices.toList()
+        
+        val prefs = context.getSharedPreferences("motto_prefs", Context.MODE_PRIVATE)
+        val lastIndex = prefs.getInt("last_motto_index", -1)
+
+        val selectedMottos = mutableListOf<String>()
+        val countToSelect = 10 // Potřebujeme dostatek unikátních mott pro seznam
+        
+        repeat(countToSelect) {
+            val availableIndices = allIndices.filter { it !in usedIndices }
+            
+            val indexToUse = if (availableIndices.isEmpty()) {
+                // Všechna motta byla použita, resetujeme
+                usedIndices.clear()
+                // Vyhneme se poslednímu použitému z minulé sady (v prvním kroku po resetu)
+                if (allIndices.size > 1) {
+                    allIndices.filter { it != lastIndex }.random()
+                } else {
+                    allIndices.random()
+                }
+            } else {
+                availableIndices.random()
+            }
+            
+            usedIndices.add(indexToUse)
+            selectedMottos.add(mottos[indexToUse])
+            
+            // Uložíme poslední skutečně vybraný index jako lastIndex pro příště
+            prefs.edit().putInt("last_motto_index", indexToUse).apply()
+        }
+        
+        _currentMottos.value = selectedMottos
+        _listMotto.value = selectedMottos.firstOrNull() ?: ""
+        
+        viewModelScope.launch {
+            repository.saveUsedMottoIndices(usedIndices)
+        }
     }
 
     private fun calculateHoursRemaining() {
@@ -365,6 +419,7 @@ class HomeViewModel(
     fun fullRefresh() {
         _lockTrigger.value++
         refreshStats()
+        rotateListMotto()
         _apps.value = repository.getInstalledApps()
         updateSelectedAppsList(_selectedApps.value.map { it.packageName })
     }

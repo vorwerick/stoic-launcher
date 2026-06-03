@@ -73,6 +73,22 @@ class UsageRepositoryImpl(
         prefs.edit().putBoolean("dark_mode", enabled).apply()
     }
 
+    override fun isMottoEnabled(): Boolean = prefs.getBoolean("motto_enabled", false)
+
+    override suspend fun setMottoEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean("motto_enabled", enabled).apply()
+    }
+
+    override fun getUsedMottoIndices(): Set<Int> {
+        val saved = prefs.getString("used_motto_indices", "") ?: ""
+        if (saved.isEmpty()) return emptySet()
+        return saved.split(",").mapNotNull { it.toIntOrNull() }.toSet()
+    }
+
+    override suspend fun saveUsedMottoIndices(indices: Set<Int>) {
+        prefs.edit().putString("used_motto_indices", indices.joinToString(",")).apply()
+    }
+
     private fun loadSelectedApps() {
         val saved = prefs.getString("selected_apps", "") ?: ""
         if (saved.isNotEmpty()) {
