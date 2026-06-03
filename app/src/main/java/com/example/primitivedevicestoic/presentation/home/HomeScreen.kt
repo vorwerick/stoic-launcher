@@ -828,6 +828,33 @@ fun HomeScreen(
                         )
                     }
 
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = stringResource(R.string.support_description),
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = themeFg,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    val coffeeUrl = stringResource(R.string.coffee_url)
+                    OutlinedButton(
+                        onClick = {
+                            context.startActivity(
+                                Intent(Intent.ACTION_VIEW, coffeeUrl.toUri())
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, themeFg.copy(0.2f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = themeFg)
+                    ) {
+                        Text(
+                            stringResource(R.string.buy_me_coffee),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+
                     Spacer(modifier = Modifier.height(16.dp))
                     val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
                     val versionName = packageInfo.versionName ?: "1.0"

@@ -18,9 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.primitivedevicestoic.R
 import com.example.primitivedevicestoic.ui.theme.White
 import org.koin.androidx.compose.koinViewModel
@@ -66,9 +69,21 @@ fun WelcomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_launcher),
+                contentDescription = null,
+                modifier = Modifier.size(100.dp),
+                tint = Color.Unspecified
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             Text(
-                text = stringResource(R.string.welcome_title),
-                style = MaterialTheme.typography.headlineMedium,
+                text = stringResource(R.string.app_name),
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontWeight = FontWeight.Light,
+                    letterSpacing = 2.sp
+                ),
                 textAlign = TextAlign.Center,
                 color = Color.Black
             )
@@ -77,10 +92,24 @@ fun WelcomeScreen(
             
             Text(
                 text = stringResource(R.string.welcome_description),
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = Color.Black
             )
-            
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth(0.85f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                BenefitItem(text = stringResource(R.string.welcome_benefit_1))
+                Spacer(modifier = Modifier.height(8.dp))
+                BenefitItem(text = stringResource(R.string.welcome_benefit_2))
+                Spacer(modifier = Modifier.height(8.dp))
+                BenefitItem(text = stringResource(R.string.welcome_benefit_3))
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
 
             if (!isDefault) {
@@ -127,4 +156,13 @@ fun WelcomeScreen(
 fun Material3Theme(content: @Composable () -> Unit) {
     content()
 }
-// Oprava pro MaterialTheme reference v textu výše, použiju MaterialTheme.typography přímo
+
+@Composable
+fun BenefitItem(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        color = Color.Black.copy(alpha = 0.8f),
+        textAlign = TextAlign.Center
+    )
+}

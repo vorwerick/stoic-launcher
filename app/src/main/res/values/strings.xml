@@ -26,8 +26,10 @@
     <string name="set_label">Set</string>
     <string name="close">Close</string>
     <string name="selected">Selected</string>
-    <string name="welcome_title">Welcome to Primitive Stoic Launcher</string>
-    <string name="welcome_description">To function properly, the app needs to be set as the default launcher.</string>
+    <string name="welcome_description">A minimalist launcher inspired by stoicism, helping you regain your time and attention.</string>
+    <string name="welcome_benefit_1">Reduce your screen time</string>
+    <string name="welcome_benefit_2">Track your time alive (Memento Mori)</string>
+    <string name="welcome_benefit_3">Guided by ancient wisdom</string>
     <string name="set_as_default">Set as default</string>
     <string name="already_set_as_default">✅ Set as default</string>
     <string name="continue_label">Continue</string>
@@ -40,6 +42,10 @@
     <string name="editor_tip">Tip: long press anywhere for settings</string>
     <string name="set_intention_hint">Set your intention...</string>
     <string name="show_mottos">Show stoic advice</string>
+    <string name="support_title">Support the developer</string>
+    <string name="support_description">Do you want to support me?</string>
+    <string name="buy_me_coffee">Buy me a coffee</string>
+    <string name="coffee_url">https://www.buymeacoffee.com/ales</string>
     <string-array name="stoic_quotes">
         <item>You have control over your actions only.</item>
         <item>You do not need to react immediately to every thought.</item>
