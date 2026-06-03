@@ -239,7 +239,7 @@ fun HomeScreen(
     val secondaryText = themeFg.copy(alpha = 0.6f)
     val hintText = themeFg.copy(alpha = 0.4f)
 
-    var showIntentionEdit by remember { mutableStateOf(false) }
+    var showIntentionDialog by remember { mutableStateOf(false) }
     var intentionText by remember { mutableStateOf(intention) }
 
     LaunchedEffect(intention) { intentionText = intention }
@@ -424,50 +424,16 @@ fun HomeScreen(
                     color = secondaryText
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                if (showIntentionEdit) {
-                    TextField(
-                        value = intentionText,
-                        onValueChange = { intentionText = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        textStyle = MaterialTheme.typography.headlineSmall.copy(
-                            textAlign = TextAlign.Center,
-                            color = themeFg,
-                            fontWeight = FontWeight.Light
-                        ),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = themeFg,
-                            unfocusedTextColor = themeFg,
-                            cursorColor = themeFg,
-                            focusedIndicatorColor = themeFg,
-                            unfocusedIndicatorColor = subtleColor
-                        ),
-                        singleLine = true
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextButton(onClick = {
-                        viewModel.saveIntention(intentionText)
-                        showIntentionEdit = false
-                    }) {
-                        Text(
-                            stringResource(R.string.set_label),
-                            color = themeFg,
-                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
-                        )
-                    }
-                } else {
-                    Text(
-                        text = intention.ifEmpty { stringResource(R.string.set_intention_hint) },
-                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Light),
-                        color = if (intention.isEmpty()) hintText else themeFg,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { showIntentionEdit = true }
-                            .padding(horizontal = 16.dp)
-                    )
-                }
+                Text(
+                    text = intention.ifEmpty { stringResource(R.string.set_intention_hint) },
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Light),
+                    color = if (intention.isEmpty()) hintText else themeFg,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showIntentionDialog = true }
+                        .padding(horizontal = 16.dp)
+                )
             }
 
             HorizontalDivider(color = subtleColor, thickness = 0.5.dp)
@@ -826,6 +792,64 @@ fun HomeScreen(
                         stringResource(R.string.close),
                         color = themeFg,
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
+            }
+        )
+    }
+
+    if (showIntentionDialog) {
+        AlertDialog(
+            onDismissRequest = { showIntentionDialog = false },
+            containerColor = themeBg,
+            title = {
+                Text(
+                    text = stringResource(R.string.intention),
+                    color = themeFg,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            },
+            text = {
+                TextField(
+                    value = intentionText,
+                    onValueChange = { intentionText = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = themeFg),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedTextColor = themeFg,
+                        unfocusedTextColor = themeFg,
+                        cursorColor = themeFg,
+                        focusedIndicatorColor = themeFg,
+                        unfocusedIndicatorColor = subtleColor
+                    ),
+                    singleLine = true,
+                    placeholder = {
+                        Text(
+                            stringResource(R.string.set_intention_hint),
+                            color = hintText
+                        )
+                    }
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.saveIntention(intentionText)
+                    showIntentionDialog = false
+                }) {
+                    Text(
+                        stringResource(R.string.set_label),
+                        color = themeFg,
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showIntentionDialog = false }) {
+                    Text(
+                        stringResource(android.R.string.cancel),
+                        color = secondaryText
                     )
                 }
             }
