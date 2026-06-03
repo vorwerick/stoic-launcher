@@ -123,13 +123,16 @@ class UsageRepositoryImpl(
         val intent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
         }
-        return pm.queryIntentActivities(intent, 0).map {
-            AppInfo(
-                packageName = it.activityInfo.packageName,
-                label = it.loadLabel(pm).toString(),
-                icon = it.loadIcon(pm)
-            )
-        }.sortedBy { it.label.lowercase() }
+        return pm.queryIntentActivities(intent, 0)
+            .map {
+                AppInfo(
+                    packageName = it.activityInfo.packageName,
+                    label = it.loadLabel(pm).toString(),
+                    icon = it.loadIcon(pm)
+                )
+            }
+            .distinctBy { it.packageName }
+            .sortedBy { it.label.lowercase() }
     }
 
     override fun getScreenTimeMinutes(): Long {

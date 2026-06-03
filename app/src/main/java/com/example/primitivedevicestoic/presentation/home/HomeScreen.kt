@@ -688,7 +688,10 @@ fun HomeScreen(
                 LazyColumn(modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)) {
-                    items(items = filteredApps, key = { it.packageName }) { app ->
+                    items(
+                        items = filteredApps,
+                        key = { app -> "${app.packageName}_${app.label}" }
+                    ) { app ->
                         val isSelected = selectedPackageNames.contains(app.packageName)
                         Row(
                             modifier = Modifier
