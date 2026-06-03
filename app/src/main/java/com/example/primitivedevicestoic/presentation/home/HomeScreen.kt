@@ -46,23 +46,25 @@ fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-    val apps by viewModel.apps.collectAsState()
-    val selectedApps by viewModel.selectedApps.collectAsState()
-    val isEditorMode by viewModel.isEditorMode.collectAsState()
-    val daysAlive by viewModel.daysAlive.collectAsState()
-    val birthDate by viewModel.birthDate.collectAsState()
-    val intention by viewModel.intention.collectAsState()
-    val currentTime by viewModel.currentTime.collectAsState()
-    val currentDate by viewModel.currentDate.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val sleepTime by viewModel.sleepTime.collectAsState()
-    val timeUntilSleep by viewModel.timeUntilSleep.collectAsState()
-    val isDefaultLauncher by viewModel.isDefaultLauncher.collectAsState()
-    val showEditorTip by viewModel.showEditorTip.collectAsState()
-    val isDarkMode by viewModel.isDarkMode.collectAsState()
-    val isMottoEnabled by viewModel.isMottoEnabled.collectAsState()
-    val listMotto by viewModel.listMotto.collectAsState()
-    val currentMottos by viewModel.currentMottos.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    
+    val apps = uiState.apps
+    val selectedApps = uiState.selectedApps
+    val isEditorMode = uiState.isEditorMode
+    val daysAlive = uiState.daysAlive
+    val birthDate = uiState.birthDate
+    val intention = uiState.intention
+    val currentTime = uiState.currentTime
+    val currentDate = uiState.currentDate
+    val searchQuery = uiState.searchQuery
+    val sleepTime = uiState.sleepTime
+    val timeUntilSleep = uiState.timeUntilSleep
+    val isDefaultLauncher = uiState.isDefaultLauncher
+    val showEditorTip = uiState.showEditorTip
+    val isDarkMode = uiState.isDarkMode
+    val isMottoEnabled = uiState.isMottoEnabled
+    val listMotto = uiState.listMotto
+    val currentMottos = uiState.currentMottos
 
     val themeBg = if (isDarkMode) Color.Black else Color.White
     val themeFg = if (isDarkMode) Color.White else Color.Black

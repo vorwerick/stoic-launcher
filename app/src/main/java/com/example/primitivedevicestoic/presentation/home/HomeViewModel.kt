@@ -18,95 +18,58 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import com.example.primitivedevicestoic.R
+import kotlinx.coroutines.flow.update
+
+data class HomeUiState(
+    val unlockEvents: List<UnlockEvent> = emptyList(),
+    val screenTimeMinutes: Long = 0L,
+    val apps: List<AppInfo> = emptyList(),
+    val batteryPercentage: Int = 0,
+    val selectedApps: List<AppInfo> = emptyList(),
+    val isEditorMode: Boolean = false,
+    val isOfflineMode: Boolean = false,
+    val birthDate: Long? = null,
+    val daysAlive: Long? = null,
+    val hoursRemaining: Int = 0,
+    val timeSinceLastUse: String = "",
+    val quote: String = "",
+    val listMotto: String = "",
+    val currentMottos: List<String> = emptyList(),
+    val intention: String = "",
+    val currentTime: String = "",
+    val currentDate: String = "",
+    val sleepTime: String = "",
+    val timeUntilSleep: String? = null,
+    val todayUnlockCount: Int = 0,
+    val searchQuery: String = "",
+    val isDefaultLauncher: Boolean = false,
+    val showEditorTip: Boolean = true,
+    val isDarkMode: Boolean = false,
+    val isMottoEnabled: Boolean = false,
+    val lockTrigger: Int = 0
+)
 
 class HomeViewModel(
     private val repository: UsageRepository,
     private val context: Context
 ) : ViewModel() {
 
-    private val _unlockEvents = MutableStateFlow<List<UnlockEvent>>(emptyList())
-    val unlockEvents: StateFlow<List<UnlockEvent>> = _unlockEvents.asStateFlow()
-
-    private val _screenTimeMinutes = MutableStateFlow(0L)
-    val screenTimeMinutes: StateFlow<Long> = _screenTimeMinutes.asStateFlow()
-
-    private val _apps = MutableStateFlow<List<AppInfo>>(emptyList())
-    val apps: StateFlow<List<AppInfo>> = _apps.asStateFlow()
-
-    private val _batteryPercentage = MutableStateFlow(0)
-    val batteryPercentage: StateFlow<Int> = _batteryPercentage.asStateFlow()
-
-    private val _selectedApps = MutableStateFlow<List<AppInfo>>(emptyList())
-    val selectedApps: StateFlow<List<AppInfo>> = _selectedApps.asStateFlow()
-
-    private val _isEditorMode = MutableStateFlow(false)
-    val isEditorMode: StateFlow<Boolean> = _isEditorMode.asStateFlow()
-
-    private val _isOfflineMode = MutableStateFlow(false)
-    val isOfflineMode: StateFlow<Boolean> = _isOfflineMode.asStateFlow()
-
-    private val _birthDate = MutableStateFlow<Long?>(null)
-    val birthDate: StateFlow<Long?> = _birthDate.asStateFlow()
-
-    private val _daysAlive = MutableStateFlow<Long?>(null)
-    val daysAlive: StateFlow<Long?> = _daysAlive.asStateFlow()
-
-    private val _hoursRemaining = MutableStateFlow(0)
-    val hoursRemaining: StateFlow<Int> = _hoursRemaining.asStateFlow()
-
-    private val _timeSinceLastUse = MutableStateFlow<String>("")
-    val timeSinceLastUse: StateFlow<String> = _timeSinceLastUse.asStateFlow()
-
-    private val _quote = MutableStateFlow("")
-    val quote: StateFlow<String> = _quote.asStateFlow()
-
-    private val _listMotto = MutableStateFlow("")
-    val listMotto: StateFlow<String> = _listMotto.asStateFlow()
-
-    private val _currentMottos = MutableStateFlow<List<String>>(emptyList())
-    val currentMottos: StateFlow<List<String>> = _currentMottos.asStateFlow()
-
-    private val _intention = MutableStateFlow("")
-    val intention: StateFlow<String> = _intention.asStateFlow()
-
-    private val _currentTime = MutableStateFlow("")
-    val currentTime: StateFlow<String> = _currentTime.asStateFlow()
-
-    private val _currentDate = MutableStateFlow("")
-    val currentDate: StateFlow<String> = _currentDate.asStateFlow()
-
-    private val _sleepTime = MutableStateFlow(repository.getSleepTime())
-    val sleepTime: StateFlow<String> = _sleepTime.asStateFlow()
-
-    private val _timeUntilSleep = MutableStateFlow<String?>(null)
-    val timeUntilSleep: StateFlow<String?> = _timeUntilSleep.asStateFlow()
-
-    private val _todayUnlockCount = MutableStateFlow(0)
-    val todayUnlockCount: StateFlow<Int> = _todayUnlockCount.asStateFlow()
-
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
-
-    private val _isDefaultLauncher = MutableStateFlow(isDefaultLauncher(context))
-    val isDefaultLauncher: StateFlow<Boolean> = _isDefaultLauncher.asStateFlow()
-
-    private val _showEditorTip = MutableStateFlow(repository.isEditorTipShown())
-    val showEditorTip: StateFlow<Boolean> = _showEditorTip.asStateFlow()
-
-    private val _isDarkMode = MutableStateFlow(repository.isDarkMode())
-    val isDarkMode: StateFlow<Boolean> = _isDarkMode.asStateFlow()
-
-    private val _lockTrigger = MutableStateFlow(0)
-    val lockTrigger: StateFlow<Int> = _lockTrigger.asStateFlow()
-
-    private val _isMottoEnabled = MutableStateFlow(repository.isMottoEnabled())
-    val isMottoEnabled: StateFlow<Boolean> = _isMottoEnabled.asStateFlow()
+    private val _uiState = MutableStateFlow(
+        HomeUiState(
+            sleepTime = repository.getSleepTime(),
+            isDefaultLauncher = isDefaultLauncher(context),
+            showEditorTip = repository.isEditorTipShown(),
+            isDarkMode = repository.isDarkMode(),
+            isMottoEnabled = repository.isMottoEnabled()
+        )
+    )
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     private var updateJob: kotlinx.coroutines.Job? = null
 
     private val batteryReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            _batteryPercentage.value = getBatteryLevel()
+            _uiState.update { it.copy(batteryPercentage = getBatteryLevel()) }
         }
     }
 
@@ -147,16 +110,18 @@ class HomeViewModel(
     }
 
     fun loadData() {
-        _isOfflineMode.value = repository.isOfflineMode()
-        _birthDate.value = repository.getBirthDate()
-        _intention.value = repository.getIntention()
+        _uiState.update { it.copy(
+            isOfflineMode = repository.isOfflineMode(),
+            birthDate = repository.getBirthDate(),
+            intention = repository.getIntention()
+        ) }
         calculateDaysAlive()
         calculateHoursRemaining()
         
         viewModelScope.launch {
-            repository.getUnlockEvents().collect {
-                _unlockEvents.value = it
-                updateTodayUnlockCount(it)
+            repository.getUnlockEvents().collect { events ->
+                _uiState.update { it.copy(unlockEvents = events) }
+                updateTodayUnlockCount(events)
             }
         }
         viewModelScope.launch {
@@ -167,15 +132,19 @@ class HomeViewModel(
     }
 
     private fun updateSelectedAppsList(packageNames: List<String>) {
-        val allApps = _apps.value.ifEmpty { repository.getInstalledApps() }
-        _selectedApps.value = packageNames.mapNotNull { pkg ->
-            allApps.find { it.packageName == pkg }
+        val allApps = _uiState.value.apps.ifEmpty { repository.getInstalledApps() }
+        _uiState.update { state ->
+            state.copy(
+                selectedApps = packageNames.mapNotNull { pkg ->
+                    allApps.find { it.packageName == pkg }
+                }
+            )
         }
     }
 
     fun toggleAppSelection(app: AppInfo) {
         viewModelScope.launch {
-            val current = _selectedApps.value.map { it.packageName }.toMutableList()
+            val current = _uiState.value.selectedApps.map { it.packageName }.toMutableList()
             if (current.contains(app.packageName)) {
                 current.remove(app.packageName)
             } else if (current.size < 8) {
@@ -186,9 +155,16 @@ class HomeViewModel(
     }
 
     fun setEditorMode(enabled: Boolean) {
-        _isEditorMode.value = enabled
-        if (enabled && _showEditorTip.value) {
-            _showEditorTip.value = false
+        _uiState.update { state ->
+            state.copy(
+                isEditorMode = enabled,
+                showEditorTip = if (enabled && state.showEditorTip) false else state.showEditorTip
+            )
+        }
+        if (enabled && _uiState.value.showEditorTip.let { false }) { // Toto je jen pro zachování logiky repository
+             // Logika uložení je níže
+        }
+        if (enabled) {
             viewModelScope.launch {
                 repository.setEditorTipShown(false)
             }
@@ -197,9 +173,9 @@ class HomeViewModel(
 
     fun toggleOfflineMode() {
         viewModelScope.launch {
-            val newValue = !_isOfflineMode.value
+            val newValue = !_uiState.value.isOfflineMode
             repository.setOfflineMode(newValue)
-            _isOfflineMode.value = newValue
+            _uiState.update { it.copy(isOfflineMode = newValue) }
             
             // Pokus o zapnutí režimu letadlo otevřením nastavení
             val intent = Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS)
@@ -209,16 +185,16 @@ class HomeViewModel(
     }
 
     fun toggleDarkMode() {
-        val newState = !_isDarkMode.value
-        _isDarkMode.value = newState
+        val newState = !_uiState.value.isDarkMode
+        _uiState.update { it.copy(isDarkMode = newState) }
         viewModelScope.launch {
             repository.setDarkMode(newState)
         }
     }
 
     fun toggleMottoEnabled() {
-        val newState = !_isMottoEnabled.value
-        _isMottoEnabled.value = newState
+        val newState = !_uiState.value.isMottoEnabled
+        _uiState.update { it.copy(isMottoEnabled = newState) }
         viewModelScope.launch {
             repository.setMottoEnabled(newState)
         }
@@ -227,13 +203,13 @@ class HomeViewModel(
     fun setBirthDate(timestamp: Long) {
         viewModelScope.launch {
             repository.saveBirthDate(timestamp)
-            _birthDate.value = timestamp
+            _uiState.update { it.copy(birthDate = timestamp) }
             calculateDaysAlive()
         }
     }
 
     private fun calculateDaysAlive() {
-        val birth = _birthDate.value ?: return
+        val birth = _uiState.value.birthDate ?: return
         val birthCalendar = Calendar.getInstance().apply { timeInMillis = birth }
         val todayCalendar = Calendar.getInstance()
         
@@ -250,7 +226,7 @@ class HomeViewModel(
         
         val diff = todayCalendar.timeInMillis - birthCalendar.timeInMillis
         val days = (diff / (1000 * 60 * 60 * 24)) + 1 // +1 protože "žiješ svůj první den" v den narození
-        _daysAlive.value = if (days > 0) days else null
+        _uiState.update { it.copy(daysAlive = if (days > 0) days else null) }
     }
 
     private fun updateTodayUnlockCount(events: List<UnlockEvent>) {
@@ -261,15 +237,15 @@ class HomeViewModel(
             set(Calendar.MILLISECOND, 0)
         }.timeInMillis
         
-        _todayUnlockCount.value = events.count { it.timestamp >= today }
+        _uiState.update { it.copy(todayUnlockCount = events.count { event -> event.timestamp >= today }) }
     }
 
     fun updateDefaultLauncherStatus() {
-        _isDefaultLauncher.value = isDefaultLauncher(context)
+        _uiState.update { it.copy(isDefaultLauncher = isDefaultLauncher(context)) }
     }
 
     fun setSearchQuery(query: String) {
-        _searchQuery.value = query
+        _uiState.update { it.copy(searchQuery = query) }
     }
 
     private fun isDefaultLauncher(context: Context): Boolean {
@@ -282,21 +258,21 @@ class HomeViewModel(
     fun saveIntention(intention: String) {
         viewModelScope.launch {
             repository.saveIntention(intention)
-            _intention.value = intention
+            _uiState.update { it.copy(intention = intention) }
         }
     }
 
     fun setSleepTime(time: String) {
         viewModelScope.launch {
             repository.saveSleepTime(time)
-            _sleepTime.value = time
+            _uiState.update { it.copy(sleepTime = time) }
             calculateTimeUntilSleep()
         }
     }
 
     fun rotateQuote() {
         val quotes = context.resources.getStringArray(R.array.stoic_quotes).toList().distinct()
-        _quote.value = quotes.random()
+        _uiState.update { it.copy(quote = quotes.random()) }
     }
 
     fun rotateListMotto() {
@@ -334,8 +310,10 @@ class HomeViewModel(
             prefs.edit().putInt("last_motto_index", indexToUse).apply()
         }
         
-        _currentMottos.value = selectedMottos
-        _listMotto.value = selectedMottos.firstOrNull() ?: ""
+        _uiState.update { it.copy(
+            currentMottos = selectedMottos,
+            listMotto = selectedMottos.firstOrNull() ?: ""
+        ) }
         
         viewModelScope.launch {
             repository.saveUsedMottoIndices(usedIndices)
@@ -345,11 +323,11 @@ class HomeViewModel(
     private fun calculateHoursRemaining() {
         val now = Calendar.getInstance()
         val hours = 23 - now.get(Calendar.HOUR_OF_DAY)
-        _hoursRemaining.value = hours
+        _uiState.update { it.copy(hoursRemaining = hours) }
     }
 
     private fun calculateTimeUntilSleep() {
-        val sleepStr = _sleepTime.value
+        val sleepStr = _uiState.value.sleepTime
         val parts = sleepStr.split(":")
         if (parts.size != 2) return
         
@@ -372,19 +350,19 @@ class HomeViewModel(
         val diffMinutes = diffMs / (1000 * 60)
         
         if (diffMinutes > 1440) { // Více než 24h by nemělo nastat díky add(DAY, 1)
-             _timeUntilSleep.value = null
-             return
+            _uiState.update { it.copy(timeUntilSleep = null) }
+            return
         }
 
         val hours = diffMinutes / 60
         val minutes = diffMinutes % 60
         
-        _timeUntilSleep.value = if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
+        _uiState.update { it.copy(timeUntilSleep = if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m") }
     }
 
     private fun calculateTimeSinceLastUse(events: List<UnlockEvent>) {
         if (events.size < 2) {
-            _timeSinceLastUse.value = "0m"
+            _uiState.update { it.copy(timeSinceLastUse = "0m") }
             return
         }
         // events[0] je aktuální odemčení, events[1] je předchozí
@@ -395,33 +373,41 @@ class HomeViewModel(
         val hours = diffMinutes / 60
         val minutes = diffMinutes % 60
         
-        _timeSinceLastUse.value = if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
+        _uiState.update { it.copy(timeSinceLastUse = if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m") }
     }
 
     fun refreshStats() {
-        _screenTimeMinutes.value = repository.getScreenTimeMinutes()
-        _batteryPercentage.value = getBatteryLevel()
-        updateTodayUnlockCount(_unlockEvents.value)
+        val events = _uiState.value.unlockEvents
+        _uiState.update { it.copy(
+            screenTimeMinutes = repository.getScreenTimeMinutes(),
+            batteryPercentage = getBatteryLevel()
+        ) }
+        updateTodayUnlockCount(events)
         updateTimeAndDate()
         calculateDaysAlive()
         calculateHoursRemaining()
         calculateTimeUntilSleep()
-        calculateTimeSinceLastUse(_unlockEvents.value)
+        calculateTimeSinceLastUse(events)
     }
 
     private fun updateTimeAndDate() {
         val now = Calendar.getInstance().time
-        _currentTime.value = SimpleDateFormat("HH:mm", Locale.getDefault()).format(now)
-        val dateStr = SimpleDateFormat("EEEE d.M.yyyy", Locale.getDefault()).format(now)
-        _currentDate.value = dateStr
+        val currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(now)
+        val currentDate = SimpleDateFormat("EEEE d.M.yyyy", Locale.getDefault()).format(now)
+        _uiState.update { it.copy(
+            currentTime = currentTime,
+            currentDate = currentDate
+        ) }
     }
 
     fun fullRefresh() {
-        _lockTrigger.value++
+        _uiState.update { it.copy(
+            lockTrigger = it.lockTrigger + 1,
+            apps = repository.getInstalledApps()
+        ) }
         refreshStats()
         rotateListMotto()
-        _apps.value = repository.getInstalledApps()
-        updateSelectedAppsList(_selectedApps.value.map { it.packageName })
+        updateSelectedAppsList(_uiState.value.selectedApps.map { it.packageName })
     }
 
     private fun getBatteryLevel(): Int {

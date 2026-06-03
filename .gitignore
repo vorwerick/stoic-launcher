@@ -20,3 +20,4 @@ secret.properties
 *.jks
 *.keystore
 /release-output/
+/.idea/
