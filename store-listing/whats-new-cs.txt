@@ -1,9 +1,0 @@
-Verze 1.0 – první vydání
-
-• Stoický launcher jako náhrada domovské obrazovky
-• Denní stoické citáty v češtině
-• Sledování odemčení telefonu a doby u obrazovky
-• Nastavení denního záměru
-• Rychlý přístup až k 10 vybraným aplikacím
-• Šedé ikony pro snížení rozptylování
-• Večerní připomínky a odpočítávání do spánku
