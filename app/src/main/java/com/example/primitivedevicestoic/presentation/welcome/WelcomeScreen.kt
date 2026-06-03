@@ -97,18 +97,7 @@ fun WelcomeScreen(
                 color = Color.Black
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
 
-            Column(
-                modifier = Modifier.fillMaxWidth(0.85f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                BenefitItem(text = stringResource(R.string.welcome_benefit_1))
-                Spacer(modifier = Modifier.height(8.dp))
-                BenefitItem(text = stringResource(R.string.welcome_benefit_2))
-                Spacer(modifier = Modifier.height(8.dp))
-                BenefitItem(text = stringResource(R.string.welcome_benefit_3))
-            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
