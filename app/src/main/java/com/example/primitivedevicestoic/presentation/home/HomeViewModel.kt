@@ -83,6 +83,12 @@ class HomeViewModel(
     private val _isDefaultLauncher = MutableStateFlow(isDefaultLauncher(context))
     val isDefaultLauncher: StateFlow<Boolean> = _isDefaultLauncher.asStateFlow()
 
+    private val _showEditorTip = MutableStateFlow(repository.isEditorTipShown())
+    val showEditorTip: StateFlow<Boolean> = _showEditorTip.asStateFlow()
+
+    private val _isDarkMode = MutableStateFlow(repository.isDarkMode())
+    val isDarkMode: StateFlow<Boolean> = _isDarkMode.asStateFlow()
+
     private val _lockTrigger = MutableStateFlow(0)
     val lockTrigger: StateFlow<Int> = _lockTrigger.asStateFlow()
 
@@ -170,6 +176,12 @@ class HomeViewModel(
 
     fun setEditorMode(enabled: Boolean) {
         _isEditorMode.value = enabled
+        if (enabled && _showEditorTip.value) {
+            _showEditorTip.value = false
+            viewModelScope.launch {
+                repository.setEditorTipShown(false)
+            }
+        }
     }
 
     fun toggleOfflineMode() {
@@ -182,6 +194,14 @@ class HomeViewModel(
             val intent = Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
+        }
+    }
+
+    fun toggleDarkMode() {
+        val newState = !_isDarkMode.value
+        _isDarkMode.value = newState
+        viewModelScope.launch {
+            repository.setDarkMode(newState)
         }
     }
 

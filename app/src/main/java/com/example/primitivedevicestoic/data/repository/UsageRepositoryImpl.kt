@@ -61,6 +61,18 @@ class UsageRepositoryImpl(
         prefs.edit().putString("sleep_time", time).apply()
     }
 
+    override fun isEditorTipShown(): Boolean = prefs.getBoolean("editor_tip_shown", true)
+
+    override suspend fun setEditorTipShown(shown: Boolean) {
+        prefs.edit().putBoolean("editor_tip_shown", shown).apply()
+    }
+
+    override fun isDarkMode(): Boolean = prefs.getBoolean("dark_mode", false)
+
+    override suspend fun setDarkMode(enabled: Boolean) {
+        prefs.edit().putBoolean("dark_mode", enabled).apply()
+    }
+
     private fun loadSelectedApps() {
         val saved = prefs.getString("selected_apps", "") ?: ""
         if (saved.isNotEmpty()) {

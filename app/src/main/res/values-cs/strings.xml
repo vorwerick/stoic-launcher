@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Primitive Device Stoic</string>
+    <string name="app_name">Stoic Launcher</string>
     <string name="app_list">Seznam aplikací</string>
     <string name="days_alive">Dnes je tvůj %1$d. den. přemýšlej nad svými činny</string>
     <string name="battery">Baterie: %1$d%%</string>
