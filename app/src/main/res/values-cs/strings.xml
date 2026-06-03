@@ -45,7 +45,6 @@
     <string name="support_title">Podpora vývojáře</string>
     <string name="support_description">Chcete mě podpořit?</string>
     <string name="buy_me_coffee">Koupit mi kávu</string>
-    <string name="coffee_url">https://www.buymeacoffee.com/ales</string>
     <string-array name="stoic_quotes">
         <item>Máš kontrolu jen nad svým jednáním.</item>
         <item>Nepotřebuješ reagovat okamžitě na každou myšlenku.</item>

@@ -318,7 +318,7 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(top = 24.dp, bottom = 24.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
+                verticalAlignment = Alignment.Top
             ) {
                 // Levá strana: Datum a Dny naživu
                 Column(horizontalAlignment = Alignment.Start) {
@@ -829,14 +829,6 @@ fun HomeScreen(
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
-                    Text(
-                        text = stringResource(R.string.support_description),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = themeFg,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
                     val coffeeUrl = stringResource(R.string.coffee_url)
                     OutlinedButton(
                         onClick = {
