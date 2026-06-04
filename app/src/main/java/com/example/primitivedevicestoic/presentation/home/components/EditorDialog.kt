@@ -22,6 +22,10 @@ fun EditorDialog(
     sleepTime: String?,
     isDefaultLauncher: Boolean,
     versionName: String,
+    isMottoEnabled: Boolean,
+    onMottoToggle: () -> Unit,
+    isSystemBarHidden: Boolean,
+    onSystemBarToggle: () -> Unit,
     themeBg: Color,
     themeFg: Color,
     onDismiss: () -> Unit,
@@ -56,6 +60,30 @@ fun EditorDialog(
                             .padding(8.dp),
                         style = MaterialTheme.typography.bodyLarge,
                         color = themeFg
+                    )
+                }
+                settingsRow(stringResource(R.string.show_mottos), themeFg) {
+                    Switch(
+                        checked = isMottoEnabled,
+                        onCheckedChange = { onMottoToggle() },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = themeFg,
+                            checkedTrackColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedThumbColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedTrackColor = themeFg.copy(alpha = 0.1f)
+                        )
+                    )
+                }
+                settingsRow(stringResource(R.string.hide_system_bar), themeFg) {
+                    Switch(
+                        checked = isSystemBarHidden,
+                        onCheckedChange = { onSystemBarToggle() },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = themeFg,
+                            checkedTrackColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedThumbColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedTrackColor = themeFg.copy(alpha = 0.1f)
+                        )
                     )
                 }
                 settingsRow(

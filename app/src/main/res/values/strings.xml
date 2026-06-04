@@ -42,6 +42,7 @@
     <string name="editor_tip">Tip: long press anywhere for settings</string>
     <string name="set_intention_hint">Set your intention...</string>
     <string name="show_mottos">Show cynic advice</string>
+    <string name="hide_system_bar">Hide system bar</string>
     <string name="support_title">Support the developer</string>
     <string name="support_description">Do you want to support me?</string>
     <string name="buy_me_coffee">Buy me a coffee</string>

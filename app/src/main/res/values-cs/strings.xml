@@ -42,6 +42,7 @@
     <string name="editor_tip">Tip: podrž dlouze kamkoliv pro nastavení</string>
     <string name="set_intention_hint">Nastav svůj záměr...</string>
     <string name="show_mottos">Zobrazovat kynické rady</string>
+    <string name="hide_system_bar">Schovat systémové lišty</string>
     <string name="support_title">Podpora vývojáře</string>
     <string name="support_description">Chcete mě podpořit?</string>
     <string name="buy_me_coffee">Koupit mi kávu</string>

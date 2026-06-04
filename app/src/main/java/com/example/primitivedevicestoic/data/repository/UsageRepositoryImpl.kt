@@ -83,6 +83,12 @@ class UsageRepositoryImpl(
         prefs.edit().putBoolean("motto_enabled", enabled).apply()
     }
 
+    override fun isSystemBarHidden(): Boolean = prefs.getBoolean("system_bar_hidden", false)
+
+    override suspend fun setSystemBarHidden(enabled: Boolean) {
+        prefs.edit().putBoolean("system_bar_hidden", enabled).apply()
+    }
+
     override fun getUsedMottoIndices(): Set<Int> {
         val saved = prefs.getString("used_motto_indices", "") ?: ""
         if (saved.isEmpty()) return emptySet()

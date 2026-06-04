@@ -25,6 +25,8 @@ interface UsageRepository {
     suspend fun setDarkMode(enabled: Boolean)
     fun isMottoEnabled(): Boolean
     suspend fun setMottoEnabled(enabled: Boolean)
+    fun isSystemBarHidden(): Boolean
+    suspend fun setSystemBarHidden(enabled: Boolean)
     fun getUsedMottoIndices(): Set<Int>
     suspend fun saveUsedMottoIndices(indices: Set<Int>)
 }

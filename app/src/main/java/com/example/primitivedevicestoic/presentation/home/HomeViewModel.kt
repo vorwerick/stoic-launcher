@@ -46,6 +46,7 @@ data class HomeUiState(
     val showEditorTip: Boolean = true,
     val isDarkMode: Boolean = false,
     val isMottoEnabled: Boolean = false,
+    val isSystemBarHidden: Boolean = false,
     val lockTrigger: Int = 0
 )
 
@@ -60,7 +61,8 @@ class HomeViewModel(
             isDefaultLauncher = isDefaultLauncher(context),
             showEditorTip = repository.isEditorTipShown(),
             isDarkMode = repository.isDarkMode(),
-            isMottoEnabled = repository.isMottoEnabled()
+            isMottoEnabled = repository.isMottoEnabled(),
+            isSystemBarHidden = repository.isSystemBarHidden()
         )
     )
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -197,6 +199,14 @@ class HomeViewModel(
         _uiState.update { it.copy(isMottoEnabled = newState) }
         viewModelScope.launch {
             repository.setMottoEnabled(newState)
+        }
+    }
+
+    fun toggleSystemBar() {
+        val newState = !_uiState.value.isSystemBarHidden
+        _uiState.update { it.copy(isSystemBarHidden = newState) }
+        viewModelScope.launch {
+            repository.setSystemBarHidden(newState)
         }
     }
 

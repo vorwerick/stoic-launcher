@@ -6,6 +6,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -33,7 +34,8 @@ fun MainContent(viewModel: WelcomeViewModel = koinViewModel()) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = com.example.primitivedevicestoic.ui.theme.White
+        containerColor = com.example.primitivedevicestoic.ui.theme.White,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { innerPadding ->
         NavHost(
             navController = navController,

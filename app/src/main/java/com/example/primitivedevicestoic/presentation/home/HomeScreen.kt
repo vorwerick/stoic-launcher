@@ -17,7 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -63,6 +66,7 @@ fun HomeScreen(
     val showEditorTip = uiState.showEditorTip
     val isDarkMode = uiState.isDarkMode
     val isMottoEnabled = uiState.isMottoEnabled
+    val isSystemBarHidden = uiState.isSystemBarHidden
     val listMotto = uiState.listMotto
     val currentMottos = uiState.currentMottos
 
@@ -109,6 +113,18 @@ fun HomeScreen(
     }
 
     val backgroundInteractionSource = remember { MutableInteractionSource() }
+
+    val view = LocalView.current
+    LaunchedEffect(isSystemBarHidden) {
+        val window = (context as? android.app.Activity)?.window ?: return@LaunchedEffect
+        val controller = WindowInsetsControllerCompat(window, view)
+        if (isSystemBarHidden) {
+            controller.hide(WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.navigationBars())
+            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        } else {
+            controller.show(WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.navigationBars())
+        }
+    }
 
     Scaffold(
         modifier = Modifier
@@ -243,6 +259,10 @@ fun HomeScreen(
             sleepTime = sleepTime,
             isDefaultLauncher = isDefaultLauncher,
             versionName = versionName,
+            isMottoEnabled = isMottoEnabled,
+            onMottoToggle = { viewModel.toggleMottoEnabled() },
+            isSystemBarHidden = isSystemBarHidden,
+            onSystemBarToggle = { viewModel.toggleSystemBar() },
             themeBg = themeBg,
             themeFg = themeFg,
             onDismiss = { viewModel.setEditorMode(false) },
