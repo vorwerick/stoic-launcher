@@ -6,13 +6,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.primitivedevicestoic.presentation.welcome.WelcomeScreen
 import com.example.primitivedevicestoic.presentation.welcome.WelcomeViewModel
 import com.example.primitivedevicestoic.presentation.home.HomeScreen
-import com.example.primitivedevicestoic.ui.theme.PrimitiveDeviceStoicTheme
+import com.example.primitivedevicestoic.ui.theme.PrimitiveDeviceCynicTheme
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -76,7 +71,7 @@ class MainActivity : ComponentActivity() {
             )
         )
         setContent {
-            PrimitiveDeviceStoicTheme {
+            PrimitiveDeviceCynicTheme {
                 MainContent()
             }
         }
@@ -94,7 +89,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    PrimitiveDeviceStoicTheme {
+    PrimitiveDeviceCynicTheme {
         Greeting("Android")
     }
 }

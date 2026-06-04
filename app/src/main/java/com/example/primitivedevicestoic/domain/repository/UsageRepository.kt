@@ -17,8 +17,8 @@ interface UsageRepository {
     suspend fun saveBirthDate(timestamp: Long)
     fun getIntention(): String
     suspend fun saveIntention(intention: String)
-    fun getSleepTime(): String
-    suspend fun saveSleepTime(time: String)
+    fun getSleepTime(): String?
+    suspend fun saveSleepTime(time: String?)
     fun isEditorTipShown(): Boolean
     suspend fun setEditorTipShown(shown: Boolean)
     fun isDarkMode(): Boolean

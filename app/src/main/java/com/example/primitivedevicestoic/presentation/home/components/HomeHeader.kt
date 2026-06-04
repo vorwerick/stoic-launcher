@@ -45,7 +45,7 @@ fun HomeHeader(
             daysAlive?.let {
                 val daysUnit = when {
                     it == 1L -> stringResource(R.string.days_unit_one)
-                    it % 10 in 2..4 && (it % 100 < 10 || it % 100 >= 20) -> stringResource(R.string.days_unit_few)
+                    it % 10 in 2..4 && (it % 100 !in 11..14) -> stringResource(R.string.days_unit_few)
                     else -> stringResource(R.string.days_unit_other)
                 }
                 Text(

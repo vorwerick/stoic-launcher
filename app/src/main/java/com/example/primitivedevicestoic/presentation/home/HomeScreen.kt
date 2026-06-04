@@ -77,7 +77,7 @@ fun HomeScreen(
 
     LaunchedEffect(intention) { intentionText = intention }
 
-    val selectedPackageNames by remember {
+    val selectedPackageNames by remember(selectedApps) {
         derivedStateOf { selectedApps.map { it.packageName }.toSet() }
     }
 
@@ -310,9 +310,9 @@ fun HomeScreen(
     }
 
     if (showTimePicker) {
-        val parts = sleepTime.split(":")
-        val initialHour = parts.getOrNull(0)?.toIntOrNull() ?: 22
-        val initialMinute = parts.getOrNull(1)?.toIntOrNull() ?: 0
+        val parts = sleepTime?.split(":")
+        val initialHour = parts?.getOrNull(0)?.toIntOrNull() ?: 22
+        val initialMinute = parts?.getOrNull(1)?.toIntOrNull() ?: 0
         val timePickerState = rememberTimePickerState(
             initialHour = initialHour,
             initialMinute = initialMinute,

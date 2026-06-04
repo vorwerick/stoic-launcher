@@ -19,7 +19,7 @@ import java.util.*
 @Composable
 fun EditorDialog(
     birthDate: Long?,
-    sleepTime: String,
+    sleepTime: String?,
     isDefaultLauncher: Boolean,
     versionName: String,
     themeBg: Color,
@@ -63,7 +63,7 @@ fun EditorDialog(
                     themeFg
                 ) {
                     Text(
-                        text = sleepTime,
+                        text = sleepTime ?: stringResource(R.string.set_label),
                         modifier = Modifier
                             .clickable { onSleepTimeClick() }
                             .padding(8.dp),

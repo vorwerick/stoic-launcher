@@ -19,7 +19,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun PrimitiveDeviceStoicTheme(content: @Composable () -> Unit) {
+fun PrimitiveDeviceCynicTheme(content: @Composable () -> Unit) {
     val colorScheme = LightColorScheme
     val view = LocalView.current
     if (!view.isInEditMode) {

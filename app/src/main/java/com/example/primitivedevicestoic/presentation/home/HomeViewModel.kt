@@ -38,7 +38,7 @@ data class HomeUiState(
     val intention: String = "",
     val currentTime: String = "",
     val currentDate: String = "",
-    val sleepTime: String = "",
+    val sleepTime: String? = null,
     val timeUntilSleep: String? = null,
     val todayUnlockCount: Int = 0,
     val searchQuery: String = "",
@@ -262,7 +262,7 @@ class HomeViewModel(
         }
     }
 
-    fun setSleepTime(time: String) {
+    fun setSleepTime(time: String?) {
         viewModelScope.launch {
             repository.saveSleepTime(time)
             _uiState.update { it.copy(sleepTime = time) }
@@ -271,12 +271,12 @@ class HomeViewModel(
     }
 
     fun rotateQuote() {
-        val quotes = context.resources.getStringArray(R.array.stoic_quotes).toList().distinct()
+        val quotes = context.resources.getStringArray(R.array.cynic_quotes).toList().distinct()
         _uiState.update { it.copy(quote = quotes.random()) }
     }
 
     fun rotateListMotto() {
-        val mottos = context.resources.getStringArray(R.array.stoic_advice).toList().distinct()
+        val mottos = context.resources.getStringArray(R.array.cynic_advice).toList().distinct()
         
         val usedIndices = repository.getUsedMottoIndices().toMutableSet()
         val allIndices = mottos.indices.toList()
@@ -327,7 +327,10 @@ class HomeViewModel(
     }
 
     private fun calculateTimeUntilSleep() {
-        val sleepStr = _uiState.value.sleepTime
+        val sleepStr = _uiState.value.sleepTime ?: run {
+            _uiState.update { it.copy(timeUntilSleep = null) }
+            return
+        }
         val parts = sleepStr.split(":")
         if (parts.size != 2) return
         

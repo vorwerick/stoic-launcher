@@ -55,10 +55,14 @@ class UsageRepositoryImpl(
         prefs.edit().putString("today_intention", intention).apply()
     }
 
-    override fun getSleepTime(): String = prefs.getString("sleep_time", "22:00") ?: "22:00"
+    override fun getSleepTime(): String? = prefs.getString("sleep_time", null)
 
-    override suspend fun saveSleepTime(time: String) {
-        prefs.edit().putString("sleep_time", time).apply()
+    override suspend fun saveSleepTime(time: String?) {
+        if (time == null) {
+            prefs.edit().remove("sleep_time").apply()
+        } else {
+            prefs.edit().putString("sleep_time", time).apply()
+        }
     }
 
     override fun isEditorTipShown(): Boolean = prefs.getBoolean("editor_tip_shown", true)

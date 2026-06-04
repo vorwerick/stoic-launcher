@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Stoic Launcher</string>
+    <string name="app_name">Cynic Launcher</string>
     <string name="app_list">App List</string>
     <string name="days_alive">Today is your %1$d. day. think about your actions</string>
     <string name="battery">Battery: %1$d%%</string>
@@ -26,7 +26,7 @@
     <string name="set_label">Set</string>
     <string name="close">Close</string>
     <string name="selected">Selected</string>
-    <string name="welcome_description">A minimalist launcher inspired by stoicism, helping you regain your time and attention.</string>
+    <string name="welcome_description">A minimalist launcher inspired by cynicism, helping you regain your time and attention.</string>
     <string name="welcome_benefit_1">Reduce your screen time</string>
     <string name="welcome_benefit_2">Track your time alive (Memento Mori)</string>
     <string name="welcome_benefit_3">Guided by ancient wisdom</string>
@@ -41,12 +41,12 @@
     <string name="until_sleep_label">until sleep</string>
     <string name="editor_tip">Tip: long press anywhere for settings</string>
     <string name="set_intention_hint">Set your intention...</string>
-    <string name="show_mottos">Show stoic advice</string>
+    <string name="show_mottos">Show cynic advice</string>
     <string name="support_title">Support the developer</string>
     <string name="support_description">Do you want to support me?</string>
     <string name="buy_me_coffee">Buy me a coffee</string>
     <string name="coffee_url" translatable="false">https://www.buymeacoffee.com/ales.dzubera</string>
-    <string-array name="stoic_quotes">
+    <string-array name="cynic_quotes">
         <item>You have control over your actions only.</item>
         <item>You do not need to react immediately to every thought.</item>
         <item>Everything is fleeting; do not let it unsettle you.</item>
@@ -58,7 +58,7 @@
         <item>Death smiles at us all; all a man can do is smile back.</item>
     </string-array>
 
-    <string-array name="stoic_advice">
+    <string-array name="cynic_advice">
         <item>Focus on what you can control</item>
         <item>Accept fate with a calm mind</item>
         <item>Don\'t react immediately, take time to think</item>
