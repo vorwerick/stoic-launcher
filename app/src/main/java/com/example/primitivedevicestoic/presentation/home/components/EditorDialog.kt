@@ -34,6 +34,7 @@ fun EditorDialog(
     onSetDefaultLauncherClick: () -> Unit,
     onRateAppClick: () -> Unit,
     onBuyMeCoffeeClick: () -> Unit,
+    onAppInfoClick: () -> Unit,
     settingsRow: @Composable (String, Color, @Composable () -> Unit) -> Unit
 ) {
     AlertDialog(
@@ -139,6 +140,20 @@ fun EditorDialog(
                 ) {
                     Text(
                         stringResource(R.string.buy_me_coffee),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = onAppInfoClick,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, themeFg.copy(0.2f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = themeFg)
+                ) {
+                    Text(
+                        stringResource(R.string.app_info),
                         style = MaterialTheme.typography.labelLarge
                     )
                 }

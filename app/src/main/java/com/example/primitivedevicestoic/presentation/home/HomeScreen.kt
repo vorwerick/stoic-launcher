@@ -149,6 +149,10 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .then(
+                    if (isSystemBarHidden) Modifier.padding(top = 24.dp)
+                    else Modifier
+                )
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -287,6 +291,12 @@ fun HomeScreen(
             },
             onBuyMeCoffeeClick = {
                 context.startActivity(Intent(Intent.ACTION_VIEW, context.getString(R.string.coffee_url).toUri()))
+            },
+            onAppInfoClick = {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = "package:${context.packageName}".toUri()
+                }
+                context.startActivity(intent)
             },
             settingsRow = { label, fg, content -> SettingsRow(label, fg, content) }
         )

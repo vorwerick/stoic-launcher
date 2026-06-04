@@ -46,6 +46,7 @@
     <string name="support_title">Podpora vývojáře</string>
     <string name="support_description">Chcete mě podpořit?</string>
     <string name="buy_me_coffee">Koupit mi kávu</string>
+    <string name="app_info">Informace o aplikaci</string>
     <string-array name="cynic_quotes">
         <item>Máš kontrolu jen nad svým jednáním.</item>
         <item>Nepotřebuješ reagovat okamžitě na každou myšlenku.</item>
