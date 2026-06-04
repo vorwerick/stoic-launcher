@@ -113,6 +113,7 @@ fun HomeScreen(
     }
 
     val backgroundInteractionSource = remember { MutableInteractionSource() }
+    val onLongClick = remember { { viewModel.setEditorMode(true) } }
 
     val view = LocalView.current
     LaunchedEffect(isSystemBarHidden) {
@@ -126,6 +127,15 @@ fun HomeScreen(
         }
     }
 
+    val onToggleDarkMode = remember { { viewModel.toggleDarkMode() } }
+    val onPhoneClick = remember {
+        {
+            val intent = Intent(Intent.ACTION_CALL_BUTTON)
+            context.startActivity(intent)
+        }
+    }
+    val onSearchClick = remember { { isSearchActive = true } }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -133,7 +143,7 @@ fun HomeScreen(
                 interactionSource = backgroundInteractionSource,
                 indication = null,
                 onClick = {},
-                onLongClick = { viewModel.setEditorMode(true) }
+                onLongClick = onLongClick
             ),
         containerColor = themeBg,
         topBar = {
@@ -213,12 +223,9 @@ fun HomeScreen(
                     isDarkMode = isDarkMode,
                     themeFg = themeFg,
                     secondaryText = secondaryText,
-                    onToggleDarkMode = { viewModel.toggleDarkMode() },
-                    onPhoneClick = {
-                        val intent = Intent(Intent.ACTION_CALL_BUTTON)
-                        context.startActivity(intent)
-                    },
-                    onSearchClick = { isSearchActive = true }
+                    onToggleDarkMode = onToggleDarkMode,
+                    onPhoneClick = onPhoneClick,
+                    onSearchClick = onSearchClick
                 )
             }
         }

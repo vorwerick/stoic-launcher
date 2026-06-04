@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -82,55 +83,76 @@ fun ColumnScope.AppCarousel(
                             }
                         }
                     }
-                    list
+                    list.toList()
                 }
 
                 itemsWithMotto.forEach { item ->
-                    if (item is AppInfo) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(40.dp)
-                                .combinedClickable(
-                                    onClick = { onAppClick(item) },
-                                    onLongClick = { onAppLongClick(item) }
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = item.label.uppercase(),
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    letterSpacing = 3.sp,
-                                    fontWeight = FontWeight.ExtraLight
-                                ),
-                                color = themeFg.copy(alpha = 0.7f),
-                                textAlign = TextAlign.Center,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    } else if (item is String) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(32.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = item.uppercase(),
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    letterSpacing = 3.sp,
-                                    fontWeight = FontWeight.ExtraLight
-                                ),
-                                color = themeFg.copy(alpha = 0.7f),
-                                textAlign = TextAlign.Center,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
+                    key(if (item is AppInfo) item.packageName else item.hashCode()) {
+                        if (item is AppInfo) {
+                            AppItem(item, onAppClick, onAppLongClick, themeFg)
+                        } else if (item is String) {
+                            MottoItem(item, themeFg)
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun AppItem(
+    app: AppInfo,
+    onAppClick: (AppInfo) -> Unit,
+    onAppLongClick: (AppInfo) -> Unit,
+    themeFg: Color
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+            .combinedClickable(
+                onClick = { onAppClick(app) },
+                onLongClick = { onAppLongClick(app) }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = app.label.uppercase(),
+            style = MaterialTheme.typography.titleMedium.copy(
+                letterSpacing = 3.sp,
+                fontWeight = FontWeight.ExtraLight
+            ),
+            color = themeFg.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun MottoItem(
+    motto: String,
+    themeFg: Color
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = motto.uppercase(),
+            style = MaterialTheme.typography.titleMedium.copy(
+                letterSpacing = 3.sp,
+                fontWeight = FontWeight.ExtraLight
+            ),
+            color = themeFg.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }

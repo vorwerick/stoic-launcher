@@ -99,19 +99,25 @@ fun SearchOverlay(
             val filteredApps by remember(apps, searchQuery) {
                 derivedStateOf {
                     val normalizedQuery = searchQuery.removeDiacritics()
-                    apps.filter {
-                        it.label.removeDiacritics().contains(normalizedQuery, ignoreCase = true)
-                    }
+                    if (normalizedQuery.isEmpty()) {
+                        apps.sortedBy { it.label.lowercase() }
+                    } else {
+                        apps.filter {
+                            it.label.removeDiacritics().contains(normalizedQuery, ignoreCase = true)
+                        }
                         .sortedBy { it.label.lowercase() }
+                    }
                 }
             }
 
-            LazyColumn(modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
                 items(
                     items = filteredApps,
-                    key = { app -> "${app.packageName}_${app.label}" }
+                    key = { app -> app.packageName }
                 ) { app ->
                     val isSelected = selectedPackageNames.contains(app.packageName)
                     Row(

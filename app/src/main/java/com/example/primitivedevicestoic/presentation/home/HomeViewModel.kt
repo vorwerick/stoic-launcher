@@ -407,10 +407,13 @@ class HomeViewModel(
         val now = Calendar.getInstance().time
         val currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(now)
         val currentDate = SimpleDateFormat("EEEE d.M.yyyy", Locale.getDefault()).format(now)
-        _uiState.update { it.copy(
-            currentTime = currentTime,
-            currentDate = currentDate
-        ) }
+        _uiState.update { 
+            if (it.currentTime == currentTime && it.currentDate == currentDate) it
+            else it.copy(
+                currentTime = currentTime,
+                currentDate = currentDate
+            )
+        }
     }
 
     fun fullRefresh() {

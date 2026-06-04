@@ -137,8 +137,7 @@ class UsageRepositoryImpl(
             .map {
                 AppInfo(
                     packageName = it.activityInfo.packageName,
-                    label = it.loadLabel(pm).toString(),
-                    icon = it.loadIcon(pm)
+                    label = it.loadLabel(pm).toString()
                 )
             }
             .distinctBy { it.packageName }
