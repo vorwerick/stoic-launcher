@@ -27,6 +27,7 @@ class UsageRepositoryImpl(
 
     override fun getUnlockEvents(): Flow<List<UnlockEvent>> = _unlockEvents.asStateFlow()
     override fun getSelectedApps(): Flow<List<String>> = _selectedApps.asStateFlow()
+    override fun getSelectedAppsList(): List<String> = _selectedApps.value
 
     override suspend fun saveSelectedApps(packageNames: List<String>) {
         val limited = packageNames.take(10)

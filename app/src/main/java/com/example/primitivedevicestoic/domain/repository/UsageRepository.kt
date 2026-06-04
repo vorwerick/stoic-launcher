@@ -10,6 +10,7 @@ interface UsageRepository {
     fun getInstalledApps(): List<AppInfo>
     fun getScreenTimeMinutes(): Long
     fun getSelectedApps(): Flow<List<String>>
+    fun getSelectedAppsList(): List<String>
     suspend fun saveSelectedApps(packageNames: List<String>)
     fun isOfflineMode(): Boolean
     suspend fun setOfflineMode(enabled: Boolean)

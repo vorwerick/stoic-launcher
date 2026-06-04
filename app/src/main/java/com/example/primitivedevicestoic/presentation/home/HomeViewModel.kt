@@ -154,8 +154,9 @@ class HomeViewModel(
         // Načteme aplikace asynchronně hned při startu
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             val apps = repository.getInstalledApps()
+            val selectedPackageNames = repository.getSelectedAppsList() // Přidáme metodu do repo nebo použijeme current value
             _uiState.update { it.copy(apps = apps.toImmutableList()) }
-            updateSelectedAppsList(_uiState.value.selectedApps.map { it.packageName })
+            updateSelectedAppsList(selectedPackageNames)
             updateFilteredApps()
         }
     }
@@ -303,6 +304,54 @@ class HomeViewModel(
             context.startActivity(intent)
         } catch (e: Exception) {
             // Log error
+        }
+    }
+
+    fun openCalendar() {
+        try {
+            val intent = Intent(Intent.ACTION_MAIN)
+            intent.addCategory(Intent.CATEGORY_APP_CALENDAR)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            // Fallback: search for calendar provider
+            try {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.setData(android.net.Uri.parse("content://com.android.calendar/time/"))
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+            } catch (e2: Exception) {
+                // Cannot open calendar
+            }
+        }
+    }
+
+    fun openClock() {
+        val clockIntents = listOf(
+            Intent(android.provider.AlarmClock.ACTION_SHOW_ALARMS),
+            Intent(Intent.ACTION_MAIN).apply { 
+                addCategory("android.intent.category.APP_CLOCK")
+            },
+            // Samsung
+            Intent().setClassName("com.sec.android.app.clockpackage", "com.sec.android.app.clockpackage.ClockPackage"),
+            // Google / Pixel / Motorola
+            Intent().setClassName("com.google.android.deskclock", "com.android.deskclock.DeskClock"),
+            // Xiaomi
+            Intent().setClassName("com.android.deskclock", "com.android.deskclock.DeskClockTabActivity"),
+            // Huawei
+            Intent().setClassName("com.android.deskclock", "com.android.deskclock.AlarmsMainActivity"),
+            // OnePlus
+            Intent().setClassName("com.oneplus.deskclock", "com.oneplus.deskclock.DeskClock")
+        )
+
+        for (intent in clockIntents) {
+            try {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+                return
+            } catch (e: Exception) {
+                continue
+            }
         }
     }
 

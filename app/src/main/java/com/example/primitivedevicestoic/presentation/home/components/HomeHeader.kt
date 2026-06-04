@@ -1,5 +1,6 @@
 package com.example.primitivedevicestoic.presentation.home.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -7,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -21,7 +23,9 @@ fun HomeHeader(
     daysAlive: Long?,
     timeUntilSleep: String?,
     themeFg: Color,
-    secondaryText: Color
+    secondaryText: Color,
+    onDateClick: () -> Unit = {},
+    onTimeClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -31,7 +35,10 @@ fun HomeHeader(
         verticalAlignment = Alignment.Top
     ) {
         // Levá strana: Datum a Dny naživu
-        Column(horizontalAlignment = Alignment.Start) {
+        Column(
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier.clickable { onDateClick() }
+        ) {
             Text(
                 text = currentDate.uppercase(),
                 style = MaterialTheme.typography.titleLarge.copy(
@@ -43,11 +50,11 @@ fun HomeHeader(
                 textAlign = TextAlign.Start
             )
             daysAlive?.let {
-                val daysUnit = when {
-                    it == 1L -> stringResource(R.string.days_unit_one)
-                    it % 10 in 2..4 && (it % 100 !in 11..14) -> stringResource(R.string.days_unit_few)
-                    else -> stringResource(R.string.days_unit_other)
-                }
+                val daysUnit = pluralStringResource(
+                    R.plurals.days_unit,
+                    it.toInt(),
+                    it.toInt()
+                )
                 Text(
                     text = stringResource(R.string.days_alive_label).lowercase(),
                     style = MaterialTheme.typography.labelSmall.copy(
@@ -73,7 +80,10 @@ fun HomeHeader(
         }
 
         // Pravá strana: Čas a Do spánku
-        Column(horizontalAlignment = Alignment.End) {
+        Column(
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier.clickable { onTimeClick() }
+        ) {
             Text(
                 text = currentTime,
                 style = MaterialTheme.typography.titleLarge.copy(

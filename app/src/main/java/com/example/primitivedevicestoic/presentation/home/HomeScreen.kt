@@ -194,7 +194,9 @@ fun HomeScreen(
                 daysAlive = daysAlive,
                 timeUntilSleep = timeUntilSleep,
                 themeFg = themeFg,
-                secondaryText = secondaryText
+                secondaryText = secondaryText,
+                onDateClick = { viewModel.openCalendar() },
+                onTimeClick = { viewModel.openClock() }
             )
 
             HorizontalDivider(color = subtleColor, thickness = 1.dp)

@@ -35,9 +35,12 @@
     <string name="continue_label">Pokračovat</string>
     <string name="rate_app">Ohodnotit aplikaci</string>
     <string name="days_alive_label">naživu</string>
-    <string name="days_unit_one">den</string>
-    <string name="days_unit_few">dny</string>
-    <string name="days_unit_other">dní</string>
+    <plurals name="days_unit">
+        <item quantity="one">den</item>
+        <item quantity="few">dny</item>
+        <item quantity="many">dní</item>
+        <item quantity="other">dní</item>
+    </plurals>
     <string name="until_sleep_label">do spánku</string>
     <string name="editor_tip">Tip: podrž dlouze kamkoliv pro nastavení</string>
     <string name="set_intention_hint">Nastav svůj záměr...</string>
