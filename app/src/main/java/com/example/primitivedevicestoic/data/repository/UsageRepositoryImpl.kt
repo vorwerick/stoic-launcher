@@ -89,6 +89,30 @@ class UsageRepositoryImpl(
         prefs.edit().putBoolean("system_bar_hidden", enabled).apply()
     }
 
+    override fun isCallsEnabled(): Boolean = prefs.getBoolean("calls_enabled", true)
+
+    override suspend fun setCallsEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean("calls_enabled", enabled).apply()
+    }
+
+    override fun isMessagesEnabled(): Boolean = prefs.getBoolean("messages_enabled", true)
+
+    override suspend fun setMessagesEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean("messages_enabled", enabled).apply()
+    }
+
+    override fun isCameraEnabled(): Boolean = prefs.getBoolean("camera_enabled", true)
+
+    override suspend fun setCameraEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean("camera_enabled", enabled).apply()
+    }
+
+    override fun isSettingsEnabled(): Boolean = prefs.getBoolean("settings_enabled", true)
+
+    override suspend fun setSettingsEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean("settings_enabled", enabled).apply()
+    }
+
     override fun getUsedMottoIndices(): Set<Int> {
         val saved = prefs.getString("used_motto_indices", "") ?: ""
         if (saved.isEmpty()) return emptySet()

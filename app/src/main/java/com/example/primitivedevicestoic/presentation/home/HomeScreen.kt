@@ -78,6 +78,11 @@ fun HomeScreen(
     val isMottoEnabled by remember { derivedStateOf { uiState.isMottoEnabled } }
     val isSystemBarHidden by remember { derivedStateOf { uiState.isSystemBarHidden } }
 
+    val isCallsEnabled by remember { derivedStateOf { uiState.isCallsEnabled } }
+    val isMessagesEnabled by remember { derivedStateOf { uiState.isMessagesEnabled } }
+    val isCameraEnabled by remember { derivedStateOf { uiState.isCameraEnabled } }
+    val isSettingsEnabled by remember { derivedStateOf { uiState.isSettingsEnabled } }
+
     val themeBg by remember { derivedStateOf { if (isDarkMode) Color.Black else Color.White } }
     val themeFg by remember { derivedStateOf { if (isDarkMode) Color.White else Color.Black } }
     val subtleColor by remember { derivedStateOf { themeFg.copy(alpha = 0.12f) } }
@@ -139,6 +144,18 @@ fun HomeScreen(
         }
     }
     val onSearchClick = remember { { isSearchActive = true } }
+    val onSettingsClick = remember {
+        {
+            try {
+                val intent = Intent(Settings.ACTION_SETTINGS)
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                // Fallback nebo logování, pokud by nastavení nešlo otevřít
+            }
+        }
+    }
+    val onCameraClick = remember { { viewModel.openCamera() } }
+    val onMessagesClick = remember { { viewModel.openMessages() } }
 
     Scaffold(
         modifier = Modifier
@@ -224,11 +241,16 @@ fun HomeScreen(
 
             if (!isSearchActive) {
                 HomeBottomBar(
-                    isDarkMode = isDarkMode,
                     themeFg = themeFg,
                     secondaryText = secondaryText,
-                    onToggleDarkMode = onToggleDarkMode,
+                    isCallsEnabled = isCallsEnabled,
+                    isMessagesEnabled = isMessagesEnabled,
+                    isCameraEnabled = isCameraEnabled,
+                    isSettingsEnabled = isSettingsEnabled,
                     onPhoneClick = onPhoneClick,
+                    onMessagesClick = onMessagesClick,
+                    onCameraClick = onCameraClick,
+                    onSettingsClick = onSettingsClick,
                     onSearchClick = onSearchClick
                 )
             }
@@ -245,6 +267,7 @@ fun HomeScreen(
             subtleColor = subtleColor,
             secondaryText = secondaryText,
             hintText = hintText,
+            isSystemBarHidden = isSystemBarHidden,
             onSearchQueryChange = { viewModel.setSearchQuery(it) },
             onCloseSearch = {
                 isSearchActive = false
@@ -273,10 +296,20 @@ fun HomeScreen(
             sleepTime = sleepTime,
             isDefaultLauncher = isDefaultLauncher,
             versionName = versionName,
+            isDarkMode = isDarkMode,
+            onDarkModeToggle = { viewModel.toggleDarkMode() },
             isMottoEnabled = isMottoEnabled,
             onMottoToggle = { viewModel.toggleMottoEnabled() },
             isSystemBarHidden = isSystemBarHidden,
             onSystemBarToggle = { viewModel.toggleSystemBar() },
+            isCallsEnabled = isCallsEnabled,
+            onCallsToggle = { viewModel.toggleCallsEnabled() },
+            isMessagesEnabled = isMessagesEnabled,
+            onMessagesToggle = { viewModel.toggleMessagesEnabled() },
+            isCameraEnabled = isCameraEnabled,
+            onCameraToggle = { viewModel.toggleCameraEnabled() },
+            isSettingsEnabled = isSettingsEnabled,
+            onSettingsToggle = { viewModel.toggleSettingsEnabled() },
             themeBg = themeBg,
             themeFg = themeFg,
             onDismiss = { viewModel.setEditorMode(false) },

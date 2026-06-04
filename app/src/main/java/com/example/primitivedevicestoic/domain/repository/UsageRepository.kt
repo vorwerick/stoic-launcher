@@ -27,6 +27,14 @@ interface UsageRepository {
     suspend fun setMottoEnabled(enabled: Boolean)
     fun isSystemBarHidden(): Boolean
     suspend fun setSystemBarHidden(enabled: Boolean)
+    fun isCallsEnabled(): Boolean
+    suspend fun setCallsEnabled(enabled: Boolean)
+    fun isMessagesEnabled(): Boolean
+    suspend fun setMessagesEnabled(enabled: Boolean)
+    fun isCameraEnabled(): Boolean
+    suspend fun setCameraEnabled(enabled: Boolean)
+    fun isSettingsEnabled(): Boolean
+    suspend fun setSettingsEnabled(enabled: Boolean)
     fun getUsedMottoIndices(): Set<Int>
     suspend fun saveUsedMottoIndices(indices: Set<Int>)
 }

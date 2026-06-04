@@ -35,6 +35,7 @@ fun SearchOverlay(
     subtleColor: Color,
     secondaryText: Color,
     hintText: Color,
+    isSystemBarHidden: Boolean,
     onSearchQueryChange: (String) -> Unit,
     onCloseSearch: () -> Unit,
     onAppClick: (AppInfo) -> Unit,
@@ -50,7 +51,13 @@ fun SearchOverlay(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 22.dp)
-                .windowInsetsPadding(WindowInsets.statusBars)
+                .then(
+                    if (isSystemBarHidden) {
+                        Modifier.padding(top = 16.dp)
+                    } else {
+                        Modifier.windowInsetsPadding(WindowInsets.statusBars)
+                    }
+                )
         ) {
             Row(
                 modifier = Modifier

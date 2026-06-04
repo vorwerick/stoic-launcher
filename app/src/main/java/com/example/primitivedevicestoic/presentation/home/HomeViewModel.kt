@@ -54,6 +54,10 @@ data class HomeUiState(
     val isDarkMode: Boolean = false,
     val isMottoEnabled: Boolean = false,
     val isSystemBarHidden: Boolean = false,
+    val isCallsEnabled: Boolean = true,
+    val isMessagesEnabled: Boolean = true,
+    val isCameraEnabled: Boolean = true,
+    val isSettingsEnabled: Boolean = true,
     val lockTrigger: Int = 0
 )
 
@@ -69,7 +73,9 @@ class HomeViewModel(
             showEditorTip = repository.isEditorTipShown(),
             isDarkMode = repository.isDarkMode(),
             isMottoEnabled = repository.isMottoEnabled(),
-            isSystemBarHidden = repository.isSystemBarHidden()
+            isSystemBarHidden = repository.isSystemBarHidden(),
+            isCallsEnabled = repository.isCallsEnabled(),
+            isMessagesEnabled = repository.isMessagesEnabled()
         )
     )
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -122,7 +128,14 @@ class HomeViewModel(
         _uiState.update { it.copy(
             isOfflineMode = repository.isOfflineMode(),
             birthDate = repository.getBirthDate(),
-            intention = repository.getIntention()
+            intention = repository.getIntention(),
+            isDarkMode = repository.isDarkMode(),
+            isMottoEnabled = repository.isMottoEnabled(),
+            isSystemBarHidden = repository.isSystemBarHidden(),
+            isCallsEnabled = repository.isCallsEnabled(),
+            isMessagesEnabled = repository.isMessagesEnabled(),
+            isCameraEnabled = repository.isCameraEnabled(),
+            isSettingsEnabled = repository.isSettingsEnabled()
         ) }
         calculateDaysAlive()
         calculateHoursRemaining()
@@ -165,7 +178,7 @@ class HomeViewModel(
             val current = _uiState.value.selectedApps.map { it.packageName }.toMutableList()
             if (current.contains(app.packageName)) {
                 current.remove(app.packageName)
-            } else if (current.size < 8) {
+            } else if (current.size < 10) {
                 current.add(app.packageName)
             }
             repository.saveSelectedApps(current)
@@ -223,6 +236,73 @@ class HomeViewModel(
         _uiState.update { it.copy(isSystemBarHidden = newState) }
         viewModelScope.launch {
             repository.setSystemBarHidden(newState)
+        }
+    }
+
+    fun toggleCallsEnabled() {
+        val newState = !_uiState.value.isCallsEnabled
+        _uiState.update { it.copy(isCallsEnabled = newState) }
+        viewModelScope.launch {
+            repository.setCallsEnabled(newState)
+        }
+    }
+
+    fun toggleMessagesEnabled() {
+        val newState = !_uiState.value.isMessagesEnabled
+        _uiState.update { it.copy(isMessagesEnabled = newState) }
+        viewModelScope.launch {
+            repository.setMessagesEnabled(newState)
+        }
+    }
+
+    fun toggleCameraEnabled() {
+        val newState = !_uiState.value.isCameraEnabled
+        _uiState.update { it.copy(isCameraEnabled = newState) }
+        viewModelScope.launch {
+            repository.setCameraEnabled(newState)
+        }
+    }
+
+    fun toggleSettingsEnabled() {
+        val newState = !_uiState.value.isSettingsEnabled
+        _uiState.update { it.copy(isSettingsEnabled = newState) }
+        viewModelScope.launch {
+            repository.setSettingsEnabled(newState)
+        }
+    }
+
+    fun openCamera() {
+        try {
+            val intent = Intent(android.provider.MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            // Log error
+        }
+    }
+
+    fun openMessages() {
+        try {
+            val intent = Intent(Intent.ACTION_MAIN)
+            intent.addCategory(Intent.CATEGORY_APP_MESSAGING)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            // Fallback for messages
+            val fallbackIntent = Intent(Intent.ACTION_VIEW)
+            fallbackIntent.setData(android.net.Uri.parse("sms:"))
+            fallbackIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(fallbackIntent)
+        }
+    }
+
+    fun openDialer() {
+        try {
+            val intent = Intent(Intent.ACTION_DIAL)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            // Log error
         }
     }
 

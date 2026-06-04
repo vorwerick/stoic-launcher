@@ -42,6 +42,11 @@
     <string name="editor_tip">Tip: podrž dlouze kamkoliv pro nastavení</string>
     <string name="set_intention_hint">Nastav svůj záměr...</string>
     <string name="show_mottos">Zobrazovat stoické rady</string>
+    <string name="show_calls">Zobrazit ikonu volání</string>
+    <string name="show_messages">Zobrazit ikonu zpráv</string>
+    <string name="show_camera">Zobrazit ikonu fotoaparátu</string>
+    <string name="show_settings">Zobrazit ikonu nastavení</string>
+    <string name="dark_mode">Tmavý režim</string>
     <string name="hide_system_bar">Schovat systémové lišty</string>
     <string name="support_title">Podpora vývojáře</string>
     <string name="support_description">Chcete mě podpořit?</string>

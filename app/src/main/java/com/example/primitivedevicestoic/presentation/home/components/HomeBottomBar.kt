@@ -4,10 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -18,11 +19,16 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun HomeBottomBar(
-    isDarkMode: Boolean,
     themeFg: Color,
     secondaryText: Color,
-    onToggleDarkMode: () -> Unit,
+    isCallsEnabled: Boolean,
+    isMessagesEnabled: Boolean,
+    isCameraEnabled: Boolean,
+    isSettingsEnabled: Boolean,
     onPhoneClick: () -> Unit,
+    onMessagesClick: () -> Unit,
+    onCameraClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     onSearchClick: () -> Unit
 ) {
     Row(
@@ -33,31 +39,63 @@ fun HomeBottomBar(
                 shape = RoundedCornerShape(24.dp)
             )
             .padding(horizontal = 12.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Přepínač Dark Mode
-        IconButton(
-            onClick = onToggleDarkMode
-        ) {
-            Icon(
-                if (isDarkMode) Icons.Filled.LightMode else Icons.Filled.DarkMode,
-                contentDescription = "Toggle dark mode",
-                tint = secondaryText,
-                modifier = Modifier.size(24.dp)
-            )
+        // Ikona telefonu
+        if (isCallsEnabled) {
+            IconButton(
+                onClick = onPhoneClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Phone,
+                    contentDescription = "Open dialer",
+                    tint = secondaryText,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
 
-        // Ikona telefonu
-        IconButton(
-            onClick = onPhoneClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.Phone,
-                contentDescription = "Open dialer",
-                tint = secondaryText,
-                modifier = Modifier.size(24.dp)
-            )
+        // Ikona zpráv
+        if (isMessagesEnabled) {
+            IconButton(
+                onClick = onMessagesClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Email,
+                    contentDescription = "Open messages",
+                    tint = secondaryText,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+
+        // Ikona fotoaparátu
+        if (isCameraEnabled) {
+            IconButton(
+                onClick = onCameraClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CameraAlt,
+                    contentDescription = "Open camera",
+                    tint = secondaryText,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+
+        // Ikona nastavení
+        if (isSettingsEnabled) {
+            IconButton(
+                onClick = onSettingsClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Open settings",
+                    tint = secondaryText,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
 
         // Search ikona

@@ -4,6 +4,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,6 +24,8 @@ fun EditorDialog(
     sleepTime: String?,
     isDefaultLauncher: Boolean,
     versionName: String,
+    isDarkMode: Boolean,
+    onDarkModeToggle: () -> Unit,
     isMottoEnabled: Boolean,
     onMottoToggle: () -> Unit,
     isSystemBarHidden: Boolean,
@@ -35,6 +39,14 @@ fun EditorDialog(
     onRateAppClick: () -> Unit,
     onBuyMeCoffeeClick: () -> Unit,
     onAppInfoClick: () -> Unit,
+    isCallsEnabled: Boolean,
+    onCallsToggle: () -> Unit,
+    isMessagesEnabled: Boolean,
+    onMessagesToggle: () -> Unit,
+    isCameraEnabled: Boolean,
+    onCameraToggle: () -> Unit,
+    isSettingsEnabled: Boolean,
+    onSettingsToggle: () -> Unit,
     settingsRow: @Composable (String, Color, @Composable () -> Unit) -> Unit
 ) {
     AlertDialog(
@@ -50,7 +62,11 @@ fun EditorDialog(
             )
         },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier.verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 settingsRow(stringResource(R.string.birth_date), themeFg) {
                     Text(
                         text = birthDate?.let {
@@ -61,6 +77,18 @@ fun EditorDialog(
                             .padding(8.dp),
                         style = MaterialTheme.typography.bodyLarge,
                         color = themeFg
+                    )
+                }
+                settingsRow(stringResource(R.string.dark_mode), themeFg) {
+                    Switch(
+                        checked = isDarkMode,
+                        onCheckedChange = { onDarkModeToggle() },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = themeFg,
+                            checkedTrackColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedThumbColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedTrackColor = themeFg.copy(alpha = 0.1f)
+                        )
                     )
                 }
                 settingsRow(stringResource(R.string.show_mottos), themeFg) {
@@ -79,6 +107,54 @@ fun EditorDialog(
                     Switch(
                         checked = isSystemBarHidden,
                         onCheckedChange = { onSystemBarToggle() },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = themeFg,
+                            checkedTrackColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedThumbColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedTrackColor = themeFg.copy(alpha = 0.1f)
+                        )
+                    )
+                }
+                settingsRow(stringResource(R.string.show_calls), themeFg) {
+                    Switch(
+                        checked = isCallsEnabled,
+                        onCheckedChange = { onCallsToggle() },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = themeFg,
+                            checkedTrackColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedThumbColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedTrackColor = themeFg.copy(alpha = 0.1f)
+                        )
+                    )
+                }
+                settingsRow(stringResource(R.string.show_messages), themeFg) {
+                    Switch(
+                        checked = isMessagesEnabled,
+                        onCheckedChange = { onMessagesToggle() },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = themeFg,
+                            checkedTrackColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedThumbColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedTrackColor = themeFg.copy(alpha = 0.1f)
+                        )
+                    )
+                }
+                settingsRow(stringResource(R.string.show_camera), themeFg) {
+                    Switch(
+                        checked = isCameraEnabled,
+                        onCheckedChange = { onCameraToggle() },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = themeFg,
+                            checkedTrackColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedThumbColor = themeFg.copy(alpha = 0.5f),
+                            uncheckedTrackColor = themeFg.copy(alpha = 0.1f)
+                        )
+                    )
+                }
+                settingsRow(stringResource(R.string.show_settings), themeFg) {
+                    Switch(
+                        checked = isSettingsEnabled,
+                        onCheckedChange = { onSettingsToggle() },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = themeFg,
                             checkedTrackColor = themeFg.copy(alpha = 0.5f),
