@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Cynic Launcher</string>
+    <string name="app_name">Stoic Launcher</string>
     <string name="app_list">Seznam aplikací</string>
     <string name="days_alive">Dnes je tvůj %1$d. den. přemýšlej nad svými činny</string>
     <string name="battery">Baterie: %1$d%%</string>
@@ -26,7 +26,7 @@
     <string name="set_label">Nastavit</string>
     <string name="close">Zavřít</string>
     <string name="selected">Vybráno</string>
-    <string name="welcome_description">Minimalistický launcher inspirovaný kynismem, který vám pomůže získat zpět váš čas a pozornost.</string>
+    <string name="welcome_description">Minimalistický launcher inspirovaný stoicismem, který vám pomůže získat zpět váš čas a pozornost.</string>
     <string name="welcome_benefit_1">Snižte čas strávený u obrazovky</string>
     <string name="welcome_benefit_2">Sledujte svůj čas naživu (Memento Mori)</string>
     <string name="welcome_benefit_3">Nechte se vést radami antických mudrců</string>
@@ -41,13 +41,13 @@
     <string name="until_sleep_label">do spánku</string>
     <string name="editor_tip">Tip: podrž dlouze kamkoliv pro nastavení</string>
     <string name="set_intention_hint">Nastav svůj záměr...</string>
-    <string name="show_mottos">Zobrazovat kynické rady</string>
+    <string name="show_mottos">Zobrazovat stoické rady</string>
     <string name="hide_system_bar">Schovat systémové lišty</string>
     <string name="support_title">Podpora vývojáře</string>
     <string name="support_description">Chcete mě podpořit?</string>
     <string name="buy_me_coffee">Koupit mi kávu</string>
     <string name="app_info">Informace o aplikaci</string>
-    <string-array name="cynic_quotes">
+    <string-array name="stoic_quotes">
         <item>Máš kontrolu jen nad svým jednáním.</item>
         <item>Nepotřebuješ reagovat okamžitě na každou myšlenku.</item>
         <item>Vše je pomíjivé, nenech se tím vyvést z míry.</item>
@@ -59,7 +59,7 @@
         <item>Smrt se na nás všechny usmívá; vše, co může člověk udělat, je usmát se nazpět.</item>
     </string-array>
 
-    <string-array name="cynic_advice">
+    <string-array name="stoic_advice">
         <item>Soustřeď se na to, co můžeš ovlivnit</item>
         <item>Přijímej osud s klidnou myslí</item>
         <item>Nereaguj hned, dej si čas na rozmyšlenou</item>

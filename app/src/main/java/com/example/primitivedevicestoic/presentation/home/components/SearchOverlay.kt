@@ -96,16 +96,22 @@ fun SearchOverlay(
                 }
             }
 
-            val filteredApps by remember(apps, searchQuery) {
+            val appsWithNormalizedLabels by remember(apps) {
                 derivedStateOf {
-                    val normalizedQuery = searchQuery.removeDiacritics()
+                    apps.map { it to it.label.removeDiacritics().lowercase() }
+                }
+            }
+
+            val filteredApps by remember(appsWithNormalizedLabels, searchQuery) {
+                derivedStateOf {
+                    val normalizedQuery = searchQuery.removeDiacritics().lowercase()
                     if (normalizedQuery.isEmpty()) {
-                        apps.sortedBy { it.label.lowercase() }
+                        appsWithNormalizedLabels.map { it.first }.sortedBy { it.label.lowercase() }
                     } else {
-                        apps.filter {
-                            it.label.removeDiacritics().contains(normalizedQuery, ignoreCase = true)
-                        }
-                        .sortedBy { it.label.lowercase() }
+                        appsWithNormalizedLabels
+                            .filter { it.second.contains(normalizedQuery) }
+                            .map { it.first }
+                            .sortedBy { it.label.lowercase() }
                     }
                 }
             }

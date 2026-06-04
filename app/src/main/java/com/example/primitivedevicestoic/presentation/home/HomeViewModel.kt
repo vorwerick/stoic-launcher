@@ -131,10 +131,16 @@ class HomeViewModel(
                 updateSelectedAppsList(packageNames)
             }
         }
+        // Načteme aplikace asynchronně hned při startu
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val apps = repository.getInstalledApps()
+            _uiState.update { it.copy(apps = apps) }
+            updateSelectedAppsList(_uiState.value.selectedApps.map { it.packageName })
+        }
     }
 
     private fun updateSelectedAppsList(packageNames: List<String>) {
-        val allApps = _uiState.value.apps.ifEmpty { repository.getInstalledApps() }
+        val allApps = _uiState.value.apps
         _uiState.update { state ->
             state.copy(
                 selectedApps = packageNames.mapNotNull { pkg ->
@@ -281,12 +287,12 @@ class HomeViewModel(
     }
 
     fun rotateQuote() {
-        val quotes = context.resources.getStringArray(R.array.cynic_quotes).toList().distinct()
+        val quotes = context.resources.getStringArray(R.array.stoic_quotes).toList().distinct()
         _uiState.update { it.copy(quote = quotes.random()) }
     }
 
     fun rotateListMotto() {
-        val mottos = context.resources.getStringArray(R.array.cynic_advice).toList().distinct()
+        val mottos = context.resources.getStringArray(R.array.stoic_advice).toList().distinct()
         
         val usedIndices = repository.getUsedMottoIndices().toMutableSet()
         val allIndices = mottos.indices.toList()
@@ -418,12 +424,15 @@ class HomeViewModel(
 
     fun fullRefresh() {
         _uiState.update { it.copy(
-            lockTrigger = it.lockTrigger + 1,
-            apps = repository.getInstalledApps()
+            lockTrigger = it.lockTrigger + 1
         ) }
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val apps = repository.getInstalledApps()
+            _uiState.update { it.copy(apps = apps) }
+            updateSelectedAppsList(_uiState.value.selectedApps.map { it.packageName })
+        }
         refreshStats()
         rotateListMotto()
-        updateSelectedAppsList(_uiState.value.selectedApps.map { it.packageName })
     }
 
     private fun getBatteryLevel(): Int {

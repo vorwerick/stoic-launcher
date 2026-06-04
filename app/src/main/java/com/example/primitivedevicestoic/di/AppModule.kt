@@ -10,7 +10,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
-    single { androidContext().getSharedPreferences("cynic_prefs", Context.MODE_PRIVATE) }
+    single { androidContext().getSharedPreferences("stoic_prefs", Context.MODE_PRIVATE) }
     single<UsageRepository> { UsageRepositoryImpl(androidContext(), get()) }
     
     viewModel { WelcomeViewModel(androidContext()) }

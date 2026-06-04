@@ -23,7 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.primitivedevicestoic.presentation.welcome.WelcomeScreen
 import com.example.primitivedevicestoic.presentation.welcome.WelcomeViewModel
 import com.example.primitivedevicestoic.presentation.home.HomeScreen
-import com.example.primitivedevicestoic.ui.theme.PrimitiveDeviceCynicTheme
+import com.example.primitivedevicestoic.ui.theme.PrimitiveDeviceStoicTheme
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
             )
         )
         setContent {
-            PrimitiveDeviceCynicTheme {
+            PrimitiveDeviceStoicTheme {
                 MainContent()
             }
         }
@@ -91,7 +91,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    PrimitiveDeviceCynicTheme {
+    PrimitiveDeviceStoicTheme {
         Greeting("Android")
     }
 }
