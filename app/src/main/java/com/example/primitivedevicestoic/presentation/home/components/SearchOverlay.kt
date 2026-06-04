@@ -6,18 +6,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,6 +28,7 @@ import com.example.primitivedevicestoic.R
 import com.example.primitivedevicestoic.domain.model.AppInfo
 import kotlinx.collections.immutable.ImmutableList
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchOverlay(
     searchQuery: String,
@@ -42,6 +46,7 @@ fun SearchOverlay(
     onToggleAppSelection: (AppInfo) -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -50,7 +55,6 @@ fun SearchOverlay(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 22.dp)
                 .then(
                     if (isSystemBarHidden) {
                         Modifier.padding(top = 16.dp)
@@ -59,82 +63,93 @@ fun SearchOverlay(
                     }
                 )
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TextField(
-                    value = searchQuery,
-                    onValueChange = onSearchQueryChange,
-                    modifier = Modifier
-                        .weight(1f)
-                        .focusRequester(focusRequester),
-                    placeholder = {
-                        Text(
-                            stringResource(R.string.what_looking_for),
-                            color = hintText,
-                            style = MaterialTheme.typography.bodyMedium
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = onSearchQueryChange,
+                onSearch = { focusManager.clearFocus() },
+                active = true,
+                onActiveChange = { if (!it) onCloseSearch() },
+                placeholder = {
+                    Text(
+                        stringResource(R.string.what_looking_for),
+                        color = hintText,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
+                leadingIcon = {
+                    IconButton(onClick = onCloseSearch) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = secondaryText
                         )
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = onCloseSearch) {
+                    }
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { onSearchQueryChange("") }) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Close search",
+                                contentDescription = "Clear search",
                                 tint = secondaryText
                             )
                         }
-                    },
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
+                    }
+                },
+                colors = SearchBarDefaults.colors(
+                    containerColor = themeBg,
+                    dividerColor = subtleColor,
+                    inputFieldColors = TextFieldDefaults.colors(
                         focusedTextColor = themeFg,
                         unfocusedTextColor = themeFg,
                         cursorColor = themeFg,
-                        focusedIndicatorColor = subtleColor,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    singleLine = true
-                )
-                LaunchedEffect(Unit) {
-                    focusRequester.requestFocus()
-                }
-            }
-
-            LazyColumn(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent
+                    )
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .padding(horizontal = if (isSystemBarHidden) 16.dp else 0.dp)
+                    .focusRequester(focusRequester)
             ) {
-                items(
-                    items = apps,
-                    key = { app -> app.packageName }
-                ) { app ->
-                    val isSelected = selectedPackageNames.contains(app.packageName)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onAppClick(app) }
-                            .padding(vertical = 12.dp, horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = app.label,
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Light),
-                            color = themeFg.copy(alpha = 0.85f),
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(onClick = { onToggleAppSelection(app) }) {
-                            Icon(
-                                imageVector = if (isSelected) Icons.Default.Close else Icons.Default.Add,
-                                contentDescription = if (isSelected) "Remove from home" else "Add to home",
-                                tint = hintText
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(
+                        items = apps,
+                        key = { app -> app.packageName }
+                    ) { app ->
+                        val isSelected = selectedPackageNames.contains(app.packageName)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onAppClick(app) }
+                                .padding(vertical = 12.dp, horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = app.label,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Light),
+                                color = themeFg.copy(alpha = 0.85f),
+                                modifier = Modifier.weight(1f)
                             )
+                            IconButton(onClick = { onToggleAppSelection(app) }) {
+                                Icon(
+                                    imageVector = if (isSelected) Icons.Default.Close else Icons.Default.Add,
+                                    contentDescription = if (isSelected) "Remove from home" else "Add to home",
+                                    tint = hintText
+                                )
+                            }
                         }
                     }
                 }
+            }
+
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
             }
         }
     }
