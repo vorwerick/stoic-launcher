@@ -23,11 +23,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.primitivedevicestoic.R
 import com.example.primitivedevicestoic.domain.model.AppInfo
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun SearchOverlay(
     searchQuery: String,
-    apps: List<AppInfo>,
+    apps: ImmutableList<AppInfo>,
     selectedPackageNames: Set<String>,
     themeBg: Color,
     themeFg: Color,
@@ -37,8 +38,7 @@ fun SearchOverlay(
     onSearchQueryChange: (String) -> Unit,
     onCloseSearch: () -> Unit,
     onAppClick: (AppInfo) -> Unit,
-    onToggleAppSelection: (AppInfo) -> Unit,
-    removeDiacritics: String.() -> String
+    onToggleAppSelection: (AppInfo) -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -96,33 +96,13 @@ fun SearchOverlay(
                 }
             }
 
-            val appsWithNormalizedLabels by remember(apps) {
-                derivedStateOf {
-                    apps.map { it to it.label.removeDiacritics().lowercase() }
-                }
-            }
-
-            val filteredApps by remember(appsWithNormalizedLabels, searchQuery) {
-                derivedStateOf {
-                    val normalizedQuery = searchQuery.removeDiacritics().lowercase()
-                    if (normalizedQuery.isEmpty()) {
-                        appsWithNormalizedLabels.map { it.first }.sortedBy { it.label.lowercase() }
-                    } else {
-                        appsWithNormalizedLabels
-                            .filter { it.second.contains(normalizedQuery) }
-                            .map { it.first }
-                            .sortedBy { it.label.lowercase() }
-                    }
-                }
-            }
-
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
             ) {
                 items(
-                    items = filteredApps,
+                    items = apps,
                     key = { app -> app.packageName }
                 ) { app ->
                     val isSelected = selectedPackageNames.contains(app.packageName)

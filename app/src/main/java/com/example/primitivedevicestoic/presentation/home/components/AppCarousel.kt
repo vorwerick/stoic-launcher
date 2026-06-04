@@ -21,14 +21,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.primitivedevicestoic.R
 import com.example.primitivedevicestoic.domain.model.AppInfo
+import kotlinx.collections.immutable.ImmutableList
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ColumnScope.AppCarousel(
-    selectedApps: List<AppInfo>,
+    selectedApps: ImmutableList<AppInfo>,
     isMottoEnabled: Boolean,
     listMotto: String,
-    currentMottos: List<String>,
+    currentMottos: ImmutableList<String>,
     themeFg: Color,
     secondaryText: Color,
     onAppClick: (AppInfo) -> Unit,
@@ -74,16 +75,14 @@ fun ColumnScope.AppCarousel(
                 verticalArrangement = Arrangement.Center
             ) {
                 val itemsWithMotto = remember(selectedApps, currentMottos, isMottoEnabled) {
-                    val list = mutableListOf<Any>()
-                    if (selectedApps.isNotEmpty()) {
+                    buildList {
                         selectedApps.forEachIndexed { index, app ->
-                            list.add(app)
+                            add(app)
                             if (isMottoEnabled && index < currentMottos.size) {
-                                list.add(currentMottos[index])
+                                add(currentMottos[index])
                             }
                         }
                     }
-                    list.toList()
                 }
 
                 itemsWithMotto.forEach { item ->

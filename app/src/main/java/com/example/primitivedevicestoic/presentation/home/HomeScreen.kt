@@ -51,39 +51,43 @@ fun HomeScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     
-    val apps = uiState.apps
-    val selectedApps = uiState.selectedApps
-    val isEditorMode = uiState.isEditorMode
-    val daysAlive = uiState.daysAlive
-    val birthDate = uiState.birthDate
-    val intention = uiState.intention
-    val currentTime = uiState.currentTime
-    val currentDate = uiState.currentDate
-    val searchQuery = uiState.searchQuery
-    val sleepTime = uiState.sleepTime
-    val timeUntilSleep = uiState.timeUntilSleep
-    val isDefaultLauncher = uiState.isDefaultLauncher
-    val showEditorTip = uiState.showEditorTip
-    val isDarkMode = uiState.isDarkMode
-    val isMottoEnabled = uiState.isMottoEnabled
-    val isSystemBarHidden = uiState.isSystemBarHidden
-    val listMotto = uiState.listMotto
-    val currentMottos = uiState.currentMottos
+    val batteryPercentage by remember { derivedStateOf { uiState.batteryPercentage } }
+    val apps by remember { derivedStateOf { uiState.apps } }
+    val filteredApps by remember { derivedStateOf { uiState.filteredApps } }
+    val selectedApps by remember { derivedStateOf { uiState.selectedApps } }
+    val selectedPackageNames by remember { derivedStateOf { uiState.selectedPackageNames } }
+    val isEditorMode by remember { derivedStateOf { uiState.isEditorMode } }
+    val isOfflineMode by remember { derivedStateOf { uiState.isOfflineMode } }
+    val birthDate by remember { derivedStateOf { uiState.birthDate } }
+    val daysAlive by remember { derivedStateOf { uiState.daysAlive } }
+    val hoursRemaining by remember { derivedStateOf { uiState.hoursRemaining } }
+    val timeSinceLastUse by remember { derivedStateOf { uiState.timeSinceLastUse } }
+    val quote by remember { derivedStateOf { uiState.quote } }
+    val listMotto by remember { derivedStateOf { uiState.listMotto } }
+    val currentMottos by remember { derivedStateOf { uiState.currentMottos } }
+    val intention by remember { derivedStateOf { uiState.intention } }
+    val currentTime by remember { derivedStateOf { uiState.currentTime } }
+    val currentDate by remember { derivedStateOf { uiState.currentDate } }
+    val sleepTime by remember { derivedStateOf { uiState.sleepTime } }
+    val timeUntilSleep by remember { derivedStateOf { uiState.timeUntilSleep } }
+    val todayUnlockCount by remember { derivedStateOf { uiState.todayUnlockCount } }
+    val searchQuery by remember { derivedStateOf { uiState.searchQuery } }
+    val isDefaultLauncher by remember { derivedStateOf { uiState.isDefaultLauncher } }
+    val showEditorTip by remember { derivedStateOf { uiState.showEditorTip } }
+    val isDarkMode by remember { derivedStateOf { uiState.isDarkMode } }
+    val isMottoEnabled by remember { derivedStateOf { uiState.isMottoEnabled } }
+    val isSystemBarHidden by remember { derivedStateOf { uiState.isSystemBarHidden } }
 
-    val themeBg = if (isDarkMode) Color.Black else Color.White
-    val themeFg = if (isDarkMode) Color.White else Color.Black
-    val subtleColor = themeFg.copy(alpha = 0.12f)
-    val secondaryText = themeFg.copy(alpha = 0.6f)
-    val hintText = themeFg.copy(alpha = 0.4f)
+    val themeBg by remember { derivedStateOf { if (isDarkMode) Color.Black else Color.White } }
+    val themeFg by remember { derivedStateOf { if (isDarkMode) Color.White else Color.Black } }
+    val subtleColor by remember { derivedStateOf { themeFg.copy(alpha = 0.12f) } }
+    val secondaryText by remember { derivedStateOf { themeFg.copy(alpha = 0.6f) } }
+    val hintText by remember { derivedStateOf { themeFg.copy(alpha = 0.4f) } }
 
     var showIntentionDialog by remember { mutableStateOf(false) }
     var intentionText by remember { mutableStateOf(intention) }
 
     LaunchedEffect(intention) { intentionText = intention }
-
-    val selectedPackageNames by remember(selectedApps) {
-        derivedStateOf { selectedApps.map { it.packageName }.toSet() }
-    }
 
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
@@ -234,7 +238,7 @@ fun HomeScreen(
     if (isSearchActive) {
         SearchOverlay(
             searchQuery = searchQuery,
-            apps = apps,
+            apps = filteredApps,
             selectedPackageNames = selectedPackageNames,
             themeBg = themeBg,
             themeFg = themeFg,
@@ -257,8 +261,7 @@ fun HomeScreen(
                 } catch (e: Exception) {
                 }
             },
-            onToggleAppSelection = { viewModel.toggleAppSelection(it) },
-            removeDiacritics = { removeDiacritics() }
+            onToggleAppSelection = { viewModel.toggleAppSelection(it) }
         )
     }
 

@@ -19,13 +19,19 @@ import java.text.SimpleDateFormat
 import java.util.*
 import com.example.primitivedevicestoic.R
 import kotlinx.coroutines.flow.update
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import java.text.Normalizer
+import java.util.regex.Pattern
 
 data class HomeUiState(
-    val unlockEvents: List<UnlockEvent> = emptyList(),
+    val unlockEvents: ImmutableList<UnlockEvent> = persistentListOf(),
     val screenTimeMinutes: Long = 0L,
-    val apps: List<AppInfo> = emptyList(),
+    val apps: ImmutableList<AppInfo> = persistentListOf(),
     val batteryPercentage: Int = 0,
-    val selectedApps: List<AppInfo> = emptyList(),
+    val selectedApps: ImmutableList<AppInfo> = persistentListOf(),
+    val selectedPackageNames: Set<String> = emptySet(),
     val isEditorMode: Boolean = false,
     val isOfflineMode: Boolean = false,
     val birthDate: Long? = null,
@@ -34,7 +40,7 @@ data class HomeUiState(
     val timeSinceLastUse: String = "",
     val quote: String = "",
     val listMotto: String = "",
-    val currentMottos: List<String> = emptyList(),
+    val currentMottos: ImmutableList<String> = persistentListOf(),
     val intention: String = "",
     val currentTime: String = "",
     val currentDate: String = "",
@@ -42,6 +48,7 @@ data class HomeUiState(
     val timeUntilSleep: String? = null,
     val todayUnlockCount: Int = 0,
     val searchQuery: String = "",
+    val filteredApps: ImmutableList<AppInfo> = persistentListOf(),
     val isDefaultLauncher: Boolean = false,
     val showEditorTip: Boolean = true,
     val isDarkMode: Boolean = false,
@@ -122,7 +129,7 @@ class HomeViewModel(
         
         viewModelScope.launch {
             repository.getUnlockEvents().collect { events ->
-                _uiState.update { it.copy(unlockEvents = events) }
+                _uiState.update { it.copy(unlockEvents = events.toImmutableList()) }
                 updateTodayUnlockCount(events)
             }
         }
@@ -134,18 +141,21 @@ class HomeViewModel(
         // Načteme aplikace asynchronně hned při startu
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             val apps = repository.getInstalledApps()
-            _uiState.update { it.copy(apps = apps) }
+            _uiState.update { it.copy(apps = apps.toImmutableList()) }
             updateSelectedAppsList(_uiState.value.selectedApps.map { it.packageName })
+            updateFilteredApps()
         }
     }
 
     private fun updateSelectedAppsList(packageNames: List<String>) {
         val allApps = _uiState.value.apps
+        val selectedPackageSet = packageNames.toSet()
         _uiState.update { state ->
             state.copy(
                 selectedApps = packageNames.mapNotNull { pkg ->
                     allApps.find { it.packageName == pkg }
-                }
+                }.toImmutableList(),
+                selectedPackageNames = selectedPackageSet
             )
         }
     }
@@ -262,6 +272,30 @@ class HomeViewModel(
 
     fun setSearchQuery(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
+        updateFilteredApps()
+    }
+
+    private fun updateFilteredApps() {
+        val query = _uiState.value.searchQuery
+        val allApps = _uiState.value.apps
+        
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.Default) {
+            val normalizedQuery = query.removeDiacritics().lowercase()
+            val filtered = if (normalizedQuery.isEmpty()) {
+                allApps.sortedBy { it.label.lowercase() }
+            } else {
+                allApps.filter { 
+                    it.label.removeDiacritics().lowercase().contains(normalizedQuery) 
+                }.sortedBy { it.label.lowercase() }
+            }
+            _uiState.update { it.copy(filteredApps = filtered.toImmutableList()) }
+        }
+    }
+
+    private fun String.removeDiacritics(): String {
+        val normalized = Normalizer.normalize(this, Normalizer.Form.NFD)
+        val pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+")
+        return pattern.matcher(normalized).replaceAll("")
     }
 
     private fun isDefaultLauncher(context: Context): Boolean {
@@ -327,7 +361,7 @@ class HomeViewModel(
         }
         
         _uiState.update { it.copy(
-            currentMottos = selectedMottos,
+            currentMottos = selectedMottos.toImmutableList(),
             listMotto = selectedMottos.firstOrNull() ?: ""
         ) }
         
@@ -428,8 +462,9 @@ class HomeViewModel(
         ) }
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             val apps = repository.getInstalledApps()
-            _uiState.update { it.copy(apps = apps) }
+            _uiState.update { it.copy(apps = apps.toImmutableList()) }
             updateSelectedAppsList(_uiState.value.selectedApps.map { it.packageName })
+            updateFilteredApps()
         }
         refreshStats()
         rotateListMotto()
