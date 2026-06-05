@@ -7,9 +7,12 @@ import android.content.SharedPreferences
 import com.example.primitivedevicestoic.domain.model.AppInfo
 import com.example.primitivedevicestoic.domain.model.UnlockEvent
 import com.example.primitivedevicestoic.domain.repository.UsageRepository
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.onStart
 import java.util.Calendar
 
 class UsageRepositoryImpl(
@@ -18,20 +21,43 @@ class UsageRepositoryImpl(
 ) : UsageRepository {
 
     private val _unlockEvents = MutableStateFlow<List<UnlockEvent>>(emptyList())
-    private val _selectedApps = MutableStateFlow<List<String>>(emptyList())
+    
+    private val preferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+        when (key) {
+            "unlock_timestamps" -> loadUnlockEvents()
+        }
+    }
     
     init {
         loadUnlockEvents()
-        loadSelectedApps()
+        prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
     override fun getUnlockEvents(): Flow<List<UnlockEvent>> = _unlockEvents.asStateFlow()
-    override fun getSelectedApps(): Flow<List<String>> = _selectedApps.asStateFlow()
-    override fun getSelectedAppsList(): List<String> = _selectedApps.value
+    
+    override fun getSelectedApps(): Flow<List<String>> = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == "selected_apps") {
+                trySend(getSelectedAppsList())
+            }
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        awaitClose {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }.onStart { emit(getSelectedAppsList()) }
+
+    override fun getSelectedAppsList(): List<String> {
+        val saved = prefs.getString("selected_apps", "") ?: ""
+        return if (saved.isNotEmpty()) {
+            saved.split(",")
+        } else {
+            emptyList()
+        }
+    }
 
     override suspend fun saveSelectedApps(packageNames: List<String>) {
         val limited = packageNames.take(10)
-        _selectedApps.value = limited
         prefs.edit().putString("selected_apps", limited.joinToString(",")).apply()
     }
     
@@ -124,12 +150,6 @@ class UsageRepositoryImpl(
         prefs.edit().putString("used_motto_indices", indices.joinToString(",")).apply()
     }
 
-    private fun loadSelectedApps() {
-        val saved = prefs.getString("selected_apps", "") ?: ""
-        if (saved.isNotEmpty()) {
-            _selectedApps.value = saved.split(",")
-        }
-    }
 
     override suspend fun saveUnlockEvent(event: UnlockEvent) {
         val current = _unlockEvents.value.toMutableList()
@@ -137,7 +157,6 @@ class UsageRepositoryImpl(
         
         // Vyfiltrujeme pouze dnešní eventy pro počítání, ale uložíme posledních 50 celkově
         val limited = current.take(50)
-        _unlockEvents.value = limited
         
         val timestamps = limited.joinToString(",") { it.timestamp.toString() }
         prefs.edit().putString("unlock_timestamps", timestamps).apply()
