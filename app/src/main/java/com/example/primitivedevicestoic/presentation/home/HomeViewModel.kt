@@ -174,15 +174,22 @@ class HomeViewModel(
         }
     }
 
-    fun toggleAppSelection(app: AppInfo) {
-        viewModelScope.launch {
-            val current = _uiState.value.selectedApps.map { it.packageName }.toMutableList()
-            if (current.contains(app.packageName)) {
-                current.remove(app.packageName)
-            } else if (current.size < 10) {
-                current.add(app.packageName)
+    fun toggleAppSelection(app: AppInfo, shouldSave: Boolean = false) {
+        val current = _uiState.value.selectedPackageNames.toMutableList()
+        val isRemoving = current.contains(app.packageName)
+        
+        if (isRemoving) {
+            current.remove(app.packageName)
+        } else if (current.size < 10) {
+            current.add(app.packageName)
+        }
+        
+        updateSelectedAppsList(current)
+        
+        if (shouldSave) {
+            viewModelScope.launch {
+                repository.saveSelectedApps(current)
             }
-            repository.saveSelectedApps(current)
         }
     }
 

@@ -57,7 +57,7 @@ class UsageRepositoryImpl(
     }
 
     override suspend fun saveSelectedApps(packageNames: List<String>) {
-        val limited = packageNames.take(10)
+        val limited = packageNames
         prefs.edit().putString("selected_apps", limited.joinToString(",")).apply()
     }
     

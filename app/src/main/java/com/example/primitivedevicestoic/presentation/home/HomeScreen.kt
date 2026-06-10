@@ -237,7 +237,7 @@ fun HomeScreen(
                     } catch (e: Exception) {
                     }
                 },
-                onAppLongClick = { app -> viewModel.toggleAppSelection(app) },
+                onAppLongClick = { app -> viewModel.toggleAppSelection(app, shouldSave = true) },
                 onAddAppClick = { isSearchActive = true }
             )
 
@@ -286,7 +286,7 @@ fun HomeScreen(
                 } catch (e: Exception) {
                 }
             },
-            onToggleAppSelection = { viewModel.toggleAppSelection(it) }
+            onToggleAppSelection = { viewModel.toggleAppSelection(it, shouldSave = true) }
         )
     }
 
