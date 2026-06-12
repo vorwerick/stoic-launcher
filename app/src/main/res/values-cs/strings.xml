@@ -22,6 +22,10 @@
     <string name="sleep_time_label">Čas spánku</string>
     <string name="hours_remaining_combined">Do konce dne zbývá %1$d hodin a %2$s do spánku</string>
     <string name="editor_settings">Nastavení</string>
+    <string name="settings_group_general">Obecné</string>
+    <string name="settings_group_display">Zobrazení</string>
+    <string name="settings_group_shortcuts">Zástupci</string>
+    <string name="settings_group_about">O aplikaci</string>
     <string name="birth_date">Datum narození</string>
     <string name="set_label">Nastavit</string>
     <string name="close">Zavřít</string>
@@ -44,7 +48,6 @@
     <string name="until_sleep_label">do spánku</string>
     <string name="editor_tip">Tip: podrž dlouze kamkoliv pro nastavení</string>
     <string name="set_intention_hint">Nastav svůj záměr...</string>
-    <string name="show_mottos">Zobrazovat stoické rady</string>
     <string name="show_calls">Zobrazit ikonu volání</string>
     <string name="show_messages">Zobrazit ikonu zpráv</string>
     <string name="show_camera">Zobrazit ikonu fotoaparátu</string>
@@ -55,58 +58,4 @@
     <string name="support_description">Chcete mě podpořit?</string>
     <string name="buy_me_coffee">Koupit mi kávu</string>
     <string name="app_info">Informace o aplikaci</string>
-    <string-array name="stoic_quotes">
-        <item>Máš kontrolu jen nad svým jednáním.</item>
-        <item>Nepotřebuješ reagovat okamžitě na každou myšlenku.</item>
-        <item>Vše je pomíjivé, nenech se tím vyvést z míry.</item>
-        <item>Štěstí tvého života závisí na kvalitě tvých myšlenek.</item>
-        <item>Nehledej, aby se věci děly tak, jak si přeješ, ale přej si, aby se děly tak, jak se dějí.</item>
-        <item>Překážka v konání posouvá konání. To, co stojí v cestě, se stává cestou.</item>
-        <item>Neztrácej čas diskusemi o tom, jaký má být dobrý člověk. Buď jím.</item>
-        <item>Tvá mysl je tvým jediným skutečným útočištěm.</item>
-        <item>Smrt se na nás všechny usmívá; vše, co může člověk udělat, je usmát se nazpět.</item>
-    </string-array>
-
-    <string-array name="stoic_advice">
-        <item>Soustřeď se na to, co můžeš ovlivnit</item>
-        <item>Přijímej osud s klidnou myslí</item>
-        <item>Nereaguj hned, dej si čas na rozmyšlenou</item>
-        <item>Hledej chybu nejdříve u sebe</item>
-        <item>Méně mluv, více poslouchej a jednej</item>
-        <item>Tvá hodnota tkví v tvém charakteru</item>
-        <item>Nepřej si, aby věci byly jinak</item>
-        <item>Překážku vnímej jako příležitost k růstu</item>
-        <item>Dělej to, co je správné, i v soukromí</item>
-        <item>Buď přísný na sebe, laskavý k ostatním</item>
-        <item>Neplýtvej časem na věci mimo tvou moc</item>
-        <item>Pamatuj, že každý okamžik je tvůj poslední</item>
-        <item>Tvé štěstí závisí na kvalitě tvých myšlenek</item>
-        <item>Nebuď otrokem svých neklidných emocí</item>
-        <item>Vše vnější je pro tvou duši lhostejné</item>
-        <item>Jednej vždy v souladu se společným blahem</item>
-        <item>Nepotřebuješ uznání od lidí, které nerespektuješ</item>
-        <item>Zvol si pravdu místo pohodlné lži</item>
-        <item>Klid hledej ve svém vnitřním světě</item>
-        <item>Žij skromně a nezávisle na majetku</item>
-        <item>Neztěžuj si na to, co nemůžeš změnit</item>
-        <item>Každý člověk je tvůj bližní, buď spravedlivý</item>
-        <item>Tvůj čas je to nejcennější, co máš</item>
-        <item>Nenech se strhnout davem k nerozvážnosti</item>
-        <item>Vzdělání bez charakteru je k ničemu</item>
-        <item>Cvič svou vůli na malých věcech</item>
-        <item>Odpouštěj druhým, sobě buď nejlepším soudcem</item>
-        <item>Strach je jen tvůj vlastní úsudek</item>
-        <item>Nic tě nemůže zranit bez tvého souhlasu</item>
-        <item>Dnešek je vše, co skutečně vlastníš</item>
-        <item>Hledej moudrost v knihách i v tichu</item>
-        <item>Tvé činy mluví hlasitěji než tvá slova</item>
-        <item>Nebuď zvědavý na věci, které tě netýkají</item>
-        <item>Ovládej své touhy, nebo ony ovládnou tebe</item>
-        <item>Buď vděčný za to, co právě máš</item>
-        <item>Smrt je přirozená část života, neboj se jí</item>
-        <item>Trpělivost je projevem vnitřní síly</item>
-        <item>Neztrácej klid kvůli cizím chybám</item>
-        <item>Žij v přítomnosti, ne v minulosti</item>
-        <item>Pravda bolí méně než věčný klam</item>
-    </string-array>
 </resources>

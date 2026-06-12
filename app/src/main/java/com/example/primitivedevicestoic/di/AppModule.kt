@@ -1,7 +1,11 @@
 package com.example.primitivedevicestoic.di
 
 import android.content.Context
+import com.example.primitivedevicestoic.data.repository.AppRepositoryImpl
+import com.example.primitivedevicestoic.data.repository.SettingsRepositoryImpl
 import com.example.primitivedevicestoic.data.repository.UsageRepositoryImpl
+import com.example.primitivedevicestoic.domain.repository.AppRepository
+import com.example.primitivedevicestoic.domain.repository.SettingsRepository
 import com.example.primitivedevicestoic.domain.repository.UsageRepository
 import com.example.primitivedevicestoic.presentation.welcome.WelcomeViewModel
 import com.example.primitivedevicestoic.presentation.home.HomeViewModel
@@ -12,7 +16,9 @@ import org.koin.dsl.module
 val appModule = module {
     single { androidContext().getSharedPreferences("stoic_prefs", Context.MODE_PRIVATE) }
     single<UsageRepository> { UsageRepositoryImpl(androidContext(), get()) }
+    single<AppRepository> { AppRepositoryImpl(androidContext(), get()) }
+    single<SettingsRepository> { SettingsRepositoryImpl(get()) }
     
     viewModel { WelcomeViewModel(androidContext()) }
-    viewModel { HomeViewModel(get<UsageRepository>(), androidContext()) }
+    viewModel { HomeViewModel(get<UsageRepository>(), get<AppRepository>(), get<SettingsRepository>(), androidContext()) }
 }

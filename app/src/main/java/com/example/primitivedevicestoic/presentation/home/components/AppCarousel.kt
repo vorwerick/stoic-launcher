@@ -27,9 +27,6 @@ import kotlinx.collections.immutable.ImmutableList
 @Composable
 fun ColumnScope.AppCarousel(
     selectedApps: ImmutableList<AppInfo>,
-    isMottoEnabled: Boolean,
-    listMotto: String,
-    currentMottos: ImmutableList<String>,
     themeFg: Color,
     secondaryText: Color,
     onAppClick: (AppInfo) -> Unit,
@@ -43,55 +40,26 @@ fun ColumnScope.AppCarousel(
         contentAlignment = Alignment.Center
     ) {
         if (selectedApps.isEmpty()) {
-            if (isMottoEnabled) {
-                Text(
-                    text = listMotto.uppercase(),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        letterSpacing = 3.sp,
-                        fontWeight = FontWeight.Light,
-                        fontStyle = FontStyle.Italic
-                    ),
-                    color = themeFg.copy(alpha = 0.7f),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(16.dp)
-                )
-            } else {
-                Text(
-                    text = stringResource(R.string.add_app).uppercase(),
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        letterSpacing = 2.sp,
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = secondaryText,
-                    modifier = Modifier
-                        .clickable { onAddAppClick() }
-                        .padding(16.dp)
-                )
-            }
+            Text(
+                text = stringResource(R.string.add_app).uppercase(),
+                style = MaterialTheme.typography.labelLarge.copy(
+                    letterSpacing = 2.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                color = secondaryText,
+                modifier = Modifier
+                    .clickable { onAddAppClick() }
+                    .padding(16.dp)
+            )
         } else {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                val itemsWithMotto = remember(selectedApps, currentMottos, isMottoEnabled) {
-                    buildList {
-                        selectedApps.forEachIndexed { index, app ->
-                            add(app)
-                            if (isMottoEnabled && index < currentMottos.size) {
-                                add(currentMottos[index])
-                            }
-                        }
-                    }
-                }
-
-                itemsWithMotto.forEach { item ->
-                    key(if (item is AppInfo) item.packageName else item.hashCode()) {
-                        if (item is AppInfo) {
-                            AppItem(item, onAppClick, onAppLongClick, themeFg)
-                        } else if (item is String) {
-                            MottoItem(item, themeFg)
-                        }
+                selectedApps.forEach { app ->
+                    key(app.packageName) {
+                        AppItem(app, onAppClick, onAppLongClick, themeFg)
                     }
                 }
             }
@@ -131,27 +99,3 @@ private fun AppItem(
     }
 }
 
-@Composable
-private fun MottoItem(
-    motto: String,
-    themeFg: Color
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(32.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = motto.uppercase(),
-            style = MaterialTheme.typography.titleMedium.copy(
-                letterSpacing = 3.sp,
-                fontWeight = FontWeight.ExtraLight
-            ),
-            color = themeFg.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}

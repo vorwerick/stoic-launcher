@@ -62,9 +62,6 @@ fun HomeScreen(
     val daysAlive by remember { derivedStateOf { uiState.daysAlive } }
     val hoursRemaining by remember { derivedStateOf { uiState.hoursRemaining } }
     val timeSinceLastUse by remember { derivedStateOf { uiState.timeSinceLastUse } }
-    val quote by remember { derivedStateOf { uiState.quote } }
-    val listMotto by remember { derivedStateOf { uiState.listMotto } }
-    val currentMottos by remember { derivedStateOf { uiState.currentMottos } }
     val intention by remember { derivedStateOf { uiState.intention } }
     val currentTime by remember { derivedStateOf { uiState.currentTime } }
     val currentDate by remember { derivedStateOf { uiState.currentDate } }
@@ -75,7 +72,6 @@ fun HomeScreen(
     val isDefaultLauncher by remember { derivedStateOf { uiState.isDefaultLauncher } }
     val showEditorTip by remember { derivedStateOf { uiState.showEditorTip } }
     val isDarkMode by remember { derivedStateOf { uiState.isDarkMode } }
-    val isMottoEnabled by remember { derivedStateOf { uiState.isMottoEnabled } }
     val isSystemBarHidden by remember { derivedStateOf { uiState.isSystemBarHidden } }
 
     val isCallsEnabled by remember { derivedStateOf { uiState.isCallsEnabled } }
@@ -225,9 +221,6 @@ fun HomeScreen(
 
             AppCarousel(
                 selectedApps = selectedApps,
-                isMottoEnabled = isMottoEnabled,
-                listMotto = listMotto,
-                currentMottos = currentMottos,
                 themeFg = themeFg,
                 secondaryText = secondaryText,
                 onAppClick = { app ->
@@ -300,8 +293,6 @@ fun HomeScreen(
             versionName = versionName,
             isDarkMode = isDarkMode,
             onDarkModeToggle = { viewModel.toggleDarkMode() },
-            isMottoEnabled = isMottoEnabled,
-            onMottoToggle = { viewModel.toggleMottoEnabled() },
             isSystemBarHidden = isSystemBarHidden,
             onSystemBarToggle = { viewModel.toggleSystemBar() },
             isCallsEnabled = isCallsEnabled,

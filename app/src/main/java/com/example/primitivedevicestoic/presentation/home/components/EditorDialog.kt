@@ -14,9 +14,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.primitivedevicestoic.R
 import java.text.SimpleDateFormat
 import java.util.*
+
+@Composable
+fun SettingHeader(text: String, color: Color) {
+    Text(
+        text = text.uppercase(),
+        style = MaterialTheme.typography.labelSmall.copy(
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp
+        ),
+        color = color.copy(alpha = 0.5f),
+        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+    )
+}
 
 @Composable
 fun EditorDialog(
@@ -26,8 +40,6 @@ fun EditorDialog(
     versionName: String,
     isDarkMode: Boolean,
     onDarkModeToggle: () -> Unit,
-    isMottoEnabled: Boolean,
-    onMottoToggle: () -> Unit,
     isSystemBarHidden: Boolean,
     onSystemBarToggle: () -> Unit,
     themeBg: Color,
@@ -65,8 +77,9 @@ fun EditorDialog(
             val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier.verticalScroll(scrollState),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                SettingHeader(stringResource(R.string.settings_group_general), themeFg)
                 settingsRow(stringResource(R.string.birth_date), themeFg) {
                     Text(
                         text = birthDate?.let {
@@ -79,22 +92,22 @@ fun EditorDialog(
                         color = themeFg
                     )
                 }
+                settingsRow(stringResource(R.string.sleep_time_label), themeFg) {
+                    Text(
+                        text = sleepTime ?: stringResource(R.string.set_label),
+                        modifier = Modifier
+                            .clickable { onSleepTimeClick() }
+                            .padding(8.dp),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = themeFg
+                    )
+                }
+
+                SettingHeader(stringResource(R.string.settings_group_display), themeFg)
                 settingsRow(stringResource(R.string.dark_mode), themeFg) {
                     Switch(
                         checked = isDarkMode,
                         onCheckedChange = { onDarkModeToggle() },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = themeFg,
-                            checkedTrackColor = themeFg.copy(alpha = 0.5f),
-                            uncheckedThumbColor = themeFg.copy(alpha = 0.5f),
-                            uncheckedTrackColor = themeFg.copy(alpha = 0.1f)
-                        )
-                    )
-                }
-                settingsRow(stringResource(R.string.show_mottos), themeFg) {
-                    Switch(
-                        checked = isMottoEnabled,
-                        onCheckedChange = { onMottoToggle() },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = themeFg,
                             checkedTrackColor = themeFg.copy(alpha = 0.5f),
@@ -115,6 +128,8 @@ fun EditorDialog(
                         )
                     )
                 }
+
+                SettingHeader(stringResource(R.string.settings_group_shortcuts), themeFg)
                 settingsRow(stringResource(R.string.show_calls), themeFg) {
                     Switch(
                         checked = isCallsEnabled,
@@ -163,21 +178,9 @@ fun EditorDialog(
                         )
                     )
                 }
-                settingsRow(
-                    stringResource(R.string.sleep_time_label),
-                    themeFg
-                ) {
-                    Text(
-                        text = sleepTime ?: stringResource(R.string.set_label),
-                        modifier = Modifier
-                            .clickable { onSleepTimeClick() }
-                            .padding(8.dp),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = themeFg
-                    )
-                }
+
+                SettingHeader(stringResource(R.string.settings_group_about), themeFg)
                 if (!isDefaultLauncher) {
-                    Spacer(modifier = Modifier.height(8.dp))
                     OutlinedButton(
                         onClick = onSetDefaultLauncherClick,
                         modifier = Modifier.fillMaxWidth(),
@@ -192,7 +195,6 @@ fun EditorDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
                 OutlinedButton(
                     onClick = onRateAppClick,
                     modifier = Modifier.fillMaxWidth(),
@@ -206,7 +208,6 @@ fun EditorDialog(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
                 OutlinedButton(
                     onClick = onBuyMeCoffeeClick,
                     modifier = Modifier.fillMaxWidth(),
@@ -220,7 +221,6 @@ fun EditorDialog(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
                 OutlinedButton(
                     onClick = onAppInfoClick,
                     modifier = Modifier.fillMaxWidth(),

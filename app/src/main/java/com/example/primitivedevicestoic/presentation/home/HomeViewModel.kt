@@ -11,6 +11,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.primitivedevicestoic.domain.model.AppInfo
 import com.example.primitivedevicestoic.domain.model.UnlockEvent
 import com.example.primitivedevicestoic.domain.repository.UsageRepository
+import com.example.primitivedevicestoic.domain.repository.AppRepository
+import com.example.primitivedevicestoic.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,9 +40,6 @@ data class HomeUiState(
     val daysAlive: Long? = null,
     val hoursRemaining: Int = 0,
     val timeSinceLastUse: String = "",
-    val quote: String = "",
-    val listMotto: String = "",
-    val currentMottos: ImmutableList<String> = persistentListOf(),
     val intention: String = "",
     val currentTime: String = "",
     val currentDate: String = "",
@@ -52,7 +51,6 @@ data class HomeUiState(
     val isDefaultLauncher: Boolean = false,
     val showEditorTip: Boolean = true,
     val isDarkMode: Boolean = false,
-    val isMottoEnabled: Boolean = false,
     val isSystemBarHidden: Boolean = false,
     val isCallsEnabled: Boolean = true,
     val isMessagesEnabled: Boolean = true,
@@ -62,20 +60,21 @@ data class HomeUiState(
 )
 
 class HomeViewModel(
-    private val repository: UsageRepository,
+    private val usageRepository: UsageRepository,
+    private val appRepository: AppRepository,
+    private val settingsRepository: SettingsRepository,
     private val context: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         HomeUiState(
-            sleepTime = repository.getSleepTime(),
+            sleepTime = settingsRepository.getSleepTime(),
             isDefaultLauncher = isDefaultLauncher(context),
-            showEditorTip = repository.isEditorTipShown(),
-            isDarkMode = repository.isDarkMode(),
-            isMottoEnabled = repository.isMottoEnabled(),
-            isSystemBarHidden = repository.isSystemBarHidden(),
-            isCallsEnabled = repository.isCallsEnabled(),
-            isMessagesEnabled = repository.isMessagesEnabled()
+            showEditorTip = settingsRepository.isEditorTipShown(),
+            isDarkMode = settingsRepository.isDarkMode(),
+            isSystemBarHidden = settingsRepository.isSystemBarHidden(),
+            isCallsEnabled = settingsRepository.isCallsEnabled(),
+            isMessagesEnabled = settingsRepository.isMessagesEnabled()
         )
     )
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -92,8 +91,6 @@ class HomeViewModel(
         fullRefresh()
         loadData()
         updateDefaultLauncherStatus()
-        rotateQuote()
-        rotateListMotto()
     }
 
     fun startPeriodicUpdates() {
@@ -126,35 +123,34 @@ class HomeViewModel(
 
     fun loadData() {
         _uiState.update { it.copy(
-            isOfflineMode = repository.isOfflineMode(),
-            birthDate = repository.getBirthDate(),
-            intention = repository.getIntention(),
-            isDarkMode = repository.isDarkMode(),
-            isMottoEnabled = repository.isMottoEnabled(),
-            isSystemBarHidden = repository.isSystemBarHidden(),
-            isCallsEnabled = repository.isCallsEnabled(),
-            isMessagesEnabled = repository.isMessagesEnabled(),
-            isCameraEnabled = repository.isCameraEnabled(),
-            isSettingsEnabled = repository.isSettingsEnabled()
+            isOfflineMode = settingsRepository.isOfflineMode(),
+            birthDate = settingsRepository.getBirthDate(),
+            intention = settingsRepository.getIntention(),
+            isDarkMode = settingsRepository.isDarkMode(),
+            isSystemBarHidden = settingsRepository.isSystemBarHidden(),
+            isCallsEnabled = settingsRepository.isCallsEnabled(),
+            isMessagesEnabled = settingsRepository.isMessagesEnabled(),
+            isCameraEnabled = settingsRepository.isCameraEnabled(),
+            isSettingsEnabled = settingsRepository.isSettingsEnabled()
         ) }
         calculateDaysAlive()
         calculateHoursRemaining()
         
         viewModelScope.launch {
-            repository.getUnlockEvents().collect { events ->
+            usageRepository.getUnlockEvents().collect { events ->
                 _uiState.update { it.copy(unlockEvents = events.toImmutableList()) }
                 updateTodayUnlockCount(events)
             }
         }
         viewModelScope.launch {
-            repository.getSelectedApps().collect { packageNames ->
+            appRepository.getSelectedApps().collect { packageNames ->
                 updateSelectedAppsList(packageNames)
             }
         }
         // Načteme aplikace asynchronně hned při startu
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
-            val apps = repository.getInstalledApps()
-            val selectedPackageNames = repository.getSelectedAppsList() // Přidáme metodu do repo nebo použijeme current value
+            val apps = appRepository.getInstalledApps()
+            val selectedPackageNames = appRepository.getSelectedAppsList()
             _uiState.update { it.copy(apps = apps.toImmutableList()) }
             updateSelectedAppsList(selectedPackageNames)
             updateFilteredApps()
@@ -188,7 +184,7 @@ class HomeViewModel(
         
         if (shouldSave) {
             viewModelScope.launch {
-                repository.saveSelectedApps(current)
+                appRepository.saveSelectedApps(current)
             }
         }
     }
@@ -205,7 +201,7 @@ class HomeViewModel(
         }
         if (enabled) {
             viewModelScope.launch {
-                repository.setEditorTipShown(false)
+                settingsRepository.setEditorTipShown(false)
             }
         }
     }
@@ -213,7 +209,7 @@ class HomeViewModel(
     fun toggleOfflineMode() {
         viewModelScope.launch {
             val newValue = !_uiState.value.isOfflineMode
-            repository.setOfflineMode(newValue)
+            settingsRepository.setOfflineMode(newValue)
             _uiState.update { it.copy(isOfflineMode = newValue) }
             
             // Pokus o zapnutí režimu letadlo otevřením nastavení
@@ -227,15 +223,7 @@ class HomeViewModel(
         val newState = !_uiState.value.isDarkMode
         _uiState.update { it.copy(isDarkMode = newState) }
         viewModelScope.launch {
-            repository.setDarkMode(newState)
-        }
-    }
-
-    fun toggleMottoEnabled() {
-        val newState = !_uiState.value.isMottoEnabled
-        _uiState.update { it.copy(isMottoEnabled = newState) }
-        viewModelScope.launch {
-            repository.setMottoEnabled(newState)
+            settingsRepository.setDarkMode(newState)
         }
     }
 
@@ -243,7 +231,7 @@ class HomeViewModel(
         val newState = !_uiState.value.isSystemBarHidden
         _uiState.update { it.copy(isSystemBarHidden = newState) }
         viewModelScope.launch {
-            repository.setSystemBarHidden(newState)
+            settingsRepository.setSystemBarHidden(newState)
         }
     }
 
@@ -251,7 +239,7 @@ class HomeViewModel(
         val newState = !_uiState.value.isCallsEnabled
         _uiState.update { it.copy(isCallsEnabled = newState) }
         viewModelScope.launch {
-            repository.setCallsEnabled(newState)
+            settingsRepository.setCallsEnabled(newState)
         }
     }
 
@@ -259,7 +247,7 @@ class HomeViewModel(
         val newState = !_uiState.value.isMessagesEnabled
         _uiState.update { it.copy(isMessagesEnabled = newState) }
         viewModelScope.launch {
-            repository.setMessagesEnabled(newState)
+            settingsRepository.setMessagesEnabled(newState)
         }
     }
 
@@ -267,7 +255,7 @@ class HomeViewModel(
         val newState = !_uiState.value.isCameraEnabled
         _uiState.update { it.copy(isCameraEnabled = newState) }
         viewModelScope.launch {
-            repository.setCameraEnabled(newState)
+            settingsRepository.setCameraEnabled(newState)
         }
     }
 
@@ -275,7 +263,7 @@ class HomeViewModel(
         val newState = !_uiState.value.isSettingsEnabled
         _uiState.update { it.copy(isSettingsEnabled = newState) }
         viewModelScope.launch {
-            repository.setSettingsEnabled(newState)
+            settingsRepository.setSettingsEnabled(newState)
         }
     }
 
@@ -364,7 +352,7 @@ class HomeViewModel(
 
     fun setBirthDate(timestamp: Long) {
         viewModelScope.launch {
-            repository.saveBirthDate(timestamp)
+            settingsRepository.saveBirthDate(timestamp)
             _uiState.update { it.copy(birthDate = timestamp) }
             calculateDaysAlive()
         }
@@ -443,66 +431,16 @@ class HomeViewModel(
 
     fun saveIntention(intention: String) {
         viewModelScope.launch {
-            repository.saveIntention(intention)
+            settingsRepository.saveIntention(intention)
             _uiState.update { it.copy(intention = intention) }
         }
     }
 
     fun setSleepTime(time: String?) {
         viewModelScope.launch {
-            repository.saveSleepTime(time)
+            settingsRepository.saveSleepTime(time)
             _uiState.update { it.copy(sleepTime = time) }
             calculateTimeUntilSleep()
-        }
-    }
-
-    fun rotateQuote() {
-        val quotes = context.resources.getStringArray(R.array.stoic_quotes).toList().distinct()
-        _uiState.update { it.copy(quote = quotes.random()) }
-    }
-
-    fun rotateListMotto() {
-        val mottos = context.resources.getStringArray(R.array.stoic_advice).toList().distinct()
-        
-        val usedIndices = repository.getUsedMottoIndices().toMutableSet()
-        val allIndices = mottos.indices.toList()
-        
-        val prefs = context.getSharedPreferences("motto_prefs", Context.MODE_PRIVATE)
-        val lastIndex = prefs.getInt("last_motto_index", -1)
-
-        val selectedMottos = mutableListOf<String>()
-        val countToSelect = 10 // Potřebujeme dostatek unikátních mott pro seznam
-        
-        repeat(countToSelect) {
-            val availableIndices = allIndices.filter { it !in usedIndices }
-            
-            val indexToUse = if (availableIndices.isEmpty()) {
-                // Všechna motta byla použita, resetujeme
-                usedIndices.clear()
-                // Vyhneme se poslednímu použitému z minulé sady (v prvním kroku po resetu)
-                if (allIndices.size > 1) {
-                    allIndices.filter { it != lastIndex }.random()
-                } else {
-                    allIndices.random()
-                }
-            } else {
-                availableIndices.random()
-            }
-            
-            usedIndices.add(indexToUse)
-            selectedMottos.add(mottos[indexToUse])
-            
-            // Uložíme poslední skutečně vybraný index jako lastIndex pro příště
-            prefs.edit().putInt("last_motto_index", indexToUse).apply()
-        }
-        
-        _uiState.update { it.copy(
-            currentMottos = selectedMottos.toImmutableList(),
-            listMotto = selectedMottos.firstOrNull() ?: ""
-        ) }
-        
-        viewModelScope.launch {
-            repository.saveUsedMottoIndices(usedIndices)
         }
     }
 
@@ -568,7 +506,7 @@ class HomeViewModel(
     fun refreshStats() {
         val events = _uiState.value.unlockEvents
         _uiState.update { it.copy(
-            screenTimeMinutes = repository.getScreenTimeMinutes(),
+            screenTimeMinutes = usageRepository.getScreenTimeMinutes(),
             batteryPercentage = getBatteryLevel()
         ) }
         updateTodayUnlockCount(events)
@@ -597,13 +535,13 @@ class HomeViewModel(
             lockTrigger = it.lockTrigger + 1
         ) }
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
-            val apps = repository.getInstalledApps()
+            val apps = appRepository.getInstalledApps()
+            val selectedPackageNames = appRepository.getSelectedAppsList()
             _uiState.update { it.copy(apps = apps.toImmutableList()) }
-            updateSelectedAppsList(_uiState.value.selectedApps.map { it.packageName })
+            updateSelectedAppsList(selectedPackageNames)
             updateFilteredApps()
         }
         refreshStats()
-        rotateListMotto()
     }
 
     private fun getBatteryLevel(): Int {

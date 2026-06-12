@@ -22,6 +22,10 @@
     <string name="sleep_time_label">Sleep time</string>
     <string name="hours_remaining_combined">Remaining today: %1$d hours and %2$s until sleep</string>
     <string name="editor_settings">Settings</string>
+    <string name="settings_group_general">General</string>
+    <string name="settings_group_display">Display</string>
+    <string name="settings_group_shortcuts">Shortcuts</string>
+    <string name="settings_group_about">About</string>
     <string name="birth_date">Date of birth</string>
     <string name="set_label">Set</string>
     <string name="close">Close</string>
@@ -42,7 +46,6 @@
     <string name="until_sleep_label">until sleep</string>
     <string name="editor_tip">Tip: long press anywhere for settings</string>
     <string name="set_intention_hint">Set your intention...</string>
-    <string name="show_mottos">Show stoic advice</string>
     <string name="show_calls">Show calls icon</string>
     <string name="show_messages">Show messages icon</string>
     <string name="show_camera">Show camera icon</string>
@@ -54,58 +57,4 @@
     <string name="buy_me_coffee">Buy me a coffee</string>
     <string name="app_info">App info</string>
     <string name="coffee_url" translatable="false">https://www.buymeacoffee.com/ales.dzubera</string>
-    <string-array name="stoic_quotes">
-        <item>You have control over your actions only.</item>
-        <item>You do not need to react immediately to every thought.</item>
-        <item>Everything is fleeting; do not let it unsettle you.</item>
-        <item>The happiness of your life depends on the quality of your thoughts.</item>
-        <item>Do not seek for things to happen as you wish, but wish for them to happen as they do.</item>
-        <item>The impediment to action advances action. What stands in the way becomes the way.</item>
-        <item>Waste no more time arguing what a good man should be. Be one.</item>
-        <item>Your mind is your only true refuge.</item>
-        <item>Death smiles at us all; all a man can do is smile back.</item>
-    </string-array>
-
-    <string-array name="stoic_advice">
-        <item>Focus on what you can control</item>
-        <item>Accept fate with a calm mind</item>
-        <item>Don\'t react immediately, take time to think</item>
-        <item>Look for the fault in yourself first</item>
-        <item>Speak less, listen and act more</item>
-        <item>Your value lies in your character</item>
-        <item>Don\'t wish for things to be different</item>
-        <item>See an obstacle as an opportunity for growth</item>
-        <item>Do what is right, even in private</item>
-        <item>Be strict with yourself, kind to others</item>
-        <item>Don\'t waste time on things beyond your power</item>
-        <item>Remember that every moment is your last</item>
-        <item>Your happiness depends on the quality of your thoughts</item>
-        <item>Don\'t be a slave to your restless emotions</item>
-        <item>Everything external is indifferent to your soul</item>
-        <item>Always act in accordance with the common good</item>
-        <item>You don\'t need recognition from people you don\'t respect</item>
-        <item>Choose truth over a comfortable lie</item>
-        <item>Seek peace in your inner world</item>
-        <item>Live modestly and independent of property</item>
-        <item>Don\'t complain about what you cannot change</item>
-        <item>Every person is your fellow, be just</item>
-        <item>Your time is the most precious thing you have</item>
-        <item>Don\'t be swept away by the crowd into recklessness</item>
-        <item>Education without character is useless</item>
-        <item>Exercise your will on small things</item>
-        <item>Forgive others, be the best judge for yourself</item>
-        <item>Fear is only your own judgment</item>
-        <item>Nothing can hurt you without your consent</item>
-        <item>Today is all you truly own</item>
-        <item>Seek wisdom in books and in silence</item>
-        <item>Your actions speak louder than your words</item>
-        <item>Don\'t be curious about things that don\'t concern you</item>
-        <item>Control your desires, or they will control you</item>
-        <item>Be grateful for what you have right now</item>
-        <item>Death is a natural part of life, don\'t fear it</item>
-        <item>Patience is a manifestation of inner strength</item>
-        <item>Don\'t lose your calm because of others\' mistakes</item>
-        <item>Live in the present, not in the past</item>
-        <item>The truth hurts less than eternal deception</item>
-    </string-array>
 </resources>
